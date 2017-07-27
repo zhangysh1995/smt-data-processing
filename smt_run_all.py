@@ -1,4 +1,5 @@
 import os
+import pwd
 import argparse
 import smt_tests as st
 
@@ -22,9 +23,9 @@ parser.add_argument('--case', type=str, help='absolute path to your test cases r
 args = parser.parse_args()
 
 if args.case == None:
-	if os.getlogin() == 'zhangysh1995':
+	if pwd.getpwuid(os.geteuid()).pw_name == 'zhangysh1995':
 		split_project('/home/zhangysh1995/ctags')
-	elif os.getlogin() == 'root':
+	elif pwd.getpwuid(os.geteuid()).pw_name == 'root':
 		split_project('/root/PPBV')
 else:
 	split_project(args.case)
