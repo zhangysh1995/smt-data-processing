@@ -4,25 +4,21 @@
 import time
 import os
 import csv
+import pandas as pd
 import multiprocessing
 import glob
 import fileinput
+import argparse
 
 from os import kill
 from signal import alarm, signal, SIGALRM, SIGKILL
 from subprocess import PIPE, Popen
 
-# usage: python3 smt_tests.py
+# usage: python3 smt_tests.py config.json
 
-# Assume smt2 & cnfs path have the same prefix
 # fill the path to fit your files' location
-if os.getlogin() == 'zhangysh1995':
-	cases = '/home/zhangysh1995/ctags'
 
-
-solvers = ['z3', 'stp', 'boolector', 'ppbv']
-# configure the following for your solvers
-# versions
+solver_list = ['z3', 'stp', 'boolector', 'ppbv']
 '''
 z3
 stp
@@ -30,17 +26,19 @@ ppbv
 boolector
 '''
 
-if os.getlogin() == 'zhangysh1995':
+if os.getlogin() == 'zhangysh1995':  # configure on my local desktop
 	z3_path = '/home/zhangysh1995/work/ppdev/z3/build/z3'
 	stp_path = '/home/zhangysh1995/work/stp/stp/build/stp-2.1.2 --SMTLIB2'
 	pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
 	boolector_path = '/home/zhangysh1995/work/boolector-2.4.1/boolector/bin/boolector --smt2'
-elif os.getlogin() == 'klee':
+elif os.getlogin() == 'root':  # configure on sbtest1 docker image
 	z3_path = '/root/Solvers/z3-4.5.0/build/z3'
 	stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2 --SMTLIB2'
 	pp_path = '/root/Solvers/ppsat/build-dev/ppbv'
 	boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
-
+else:
+	print('Wrong user!')
+	exit(-1)
 
 # The factory to create solvers
 class SolverFactory:
@@ -89,12 +87,15 @@ def find_cnf(path):
 # find smt2 files in path
 def find_smt2(path):
 	flist = []  # path to smtlib2 files
-	for root, dirs, files in os.walk(path):  # search the directory
-		for fname in files:
-			if os.path.splitext(fname)[1] == '.smt2':
-				flist.append(os.path.join(root, fname))
-	return flist
-
+	if path != None and os.path.exists(path):
+		for root, dirs, files in os.walk(path):  # search the directory
+			for fname in files:
+				if os.path.splitext(fname)[1] == '.smt2':
+					flist.append(os.path.join(root, fname))
+		return flist
+	else:
+		print('Use -h for help')
+		exit(-1)
 
 def split_list(alist, wanted_parts=1):
 	length = len(alist)
@@ -102,11 +103,11 @@ def split_list(alist, wanted_parts=1):
 			for i in range(wanted_parts)]
 
 
-now = time.strftime('%Y-%m-%d-')
-
-
 def find_csv(path):
 	return glob.glob(path + '/*.csv')
+
+# file naming format
+now = time.strftime('%Y-%m-%d-')
 
 
 # filename of csv
@@ -120,11 +121,10 @@ def file_withCPU(solver, cpu):
 
 # combine files of the same sovler
 def combine_data(cpu=4):
-	# os.mkdir('Out')
-	for solver in solvers:
+	for solver in solver_list:
 		outfile = file(solver)
 		for i in range(cpu):
-			with open('Out/' + outfile, 'w+') as f:
+			with open('Out/' + outfile, 'a+') as f:
 				input = fileinput.input(file_withCPU(solver, i))
 				f.writelines(input)
 				f.flush()
@@ -135,9 +135,9 @@ def combine_data(cpu=4):
 
 
 # Save results to file
-def output_results(solver, cpu):
-	newfile = time.strftime('%Y-%m-%d-') + solver.name + str(cpu) + '.csv'
-	with open(newfile, 'w', newline='') as csvfile:
+def output_results_separate(solver, cpu):
+	newfile = file_withCPU(solver.name, cpu)
+	with open(newfile, 'a+', newline='') as csvfile:
 		fieldnames = ['result', 'time']
 		try:
 			spamwriter = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
@@ -155,6 +155,22 @@ def output_results(solver, cpu):
 		except IOError as e:
 			print('File I/O error: '.format(e))
 
+# Save results to a huge file
+def output_results(Solvers, cpu):
+	newfile = 'Out/' + now + 'all.csv'
+	data = {}
+	for solver in Solvers:
+		data.update({solver.name: solver.times})
+	df = pd.DataFrame(data)
+	with open(newfile, 'a+') as f:
+		try:
+			if cpu == 0:
+				df.to_csv(f, index=False)
+			else:
+				df.to_csv(f, index=False, header=False)
+			f.close()
+		except IOError as e:
+			print('I/O error when saving results: ').format(e)
 
 # output report
 def output_report(Solvers, cpu):
@@ -163,7 +179,7 @@ def output_report(Solvers, cpu):
 		try:
 			for solver in Solvers:
 				print(solver.name + ': ' + str(sum(solver.times)) + ' ' + str(solver.solved))
-				output_results(solver, cpu)
+				output_results_separate(solver, cpu)
 				f.write(solver.name + ' ' + str(sum(solver.times)) + '\n')
 			f.close()
 		except IOError as e:
@@ -296,6 +312,7 @@ def compare_solvers(flist, Solvers, cpu=0):
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
 	output_report(Solvers, cpu)
+	output_results(Solvers, cpu)
 	print('Finished!')
 
 
@@ -312,9 +329,7 @@ def test_solvers(path, Solvers):
 
 factory = SolverFactory()
 
-
-def test_solver_parallel(path):
-	flist = find_smt2(path)
+def test_solver_parallel(flist):
 	print('-------------Started!------------')
 	print('Total files', len(flist))
 	print('')
@@ -330,12 +345,16 @@ def test_solver_parallel(path):
 	combine_data(cpus)
 
 
-# refactor to use solver class
-# z3 = Solver('z3', z3_path)
-# stp = Solver('stp', stp_path)
-# pp = Solver('ppbv', pp_path)
-# boolector = Solver('boolector', boolector_path)
-# solvers = [z3, stp, pp, boolector]
-
-# test_solvers(cases, solvers)
-test_solver_parallel(cases)
+# test_solvers(cases, factory.create_all())
+parser = argparse.ArgumentParser(description='SMT solver testing config')
+parser.add_argument('--configure', type=str, help='point to your customized configurations')
+parser.add_argument('--case', type=str, help='specify smt2 cases directory')
+# args = parser.parse_args()
+# if sys.argv == 1:
+# 	print('Use -h for')
+# if args.case == '':
+# 	test_solver_parallel(cases)
+# else:
+# 	test_solver_parallel(args.case)
+# flist = find_smt2(args.case)
+# test_solver_parallel(flist)
