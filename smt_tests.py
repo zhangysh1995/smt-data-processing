@@ -169,21 +169,24 @@ def test_solver_parallel(flist):
 	print('All Finished!')
 	combine_data(cpus)
 
+cases = '/root/PP_CASE/curl'
 
 # test_solvers(cases, factory.create_all())
 parser = argparse.ArgumentParser(description='Run single file of smt2 cases')
 parser.add_argument('--configure', type=str, help='point to your customized configurations')
 parser.add_argument('--case', type=str, help='specify smt2 cases directory')
 args = parser.parse_args()
-#
+
 # if sys.argv == 1:
 # 	print('Use -h for')
-#
-# # if args.case == '':
-# # 	test_solver_parallel(cases)
-# # else:
-# # 	flist = find_smt2(args.case)
-# # 	test_solver_parallel(flist)
-#
-flist = find_smt2('/home/zhangysh1995/ctags')
-test_solver_parallel(flist)
+# 	exit(0)
+
+if args.case == '':
+	flist = find_smt2(cases)
+	test_solver_parallel(cases)
+else:
+ 	flist = find_smt2(args.case)
+ 	test_solver_parallel(flist)
+
+# flist = find_smt2('/home/zhangysh1995/ctags')
+# test_solver_parallel(flist)
