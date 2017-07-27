@@ -1,189 +1,16 @@
 # coding: utf-8
 
 # !/usr/bin/python3
-import time
-import os
-import csv
-import pandas as pd
-import multiprocessing
-import glob
-import fileinput
 import argparse
-
+import multiprocessing
+import os
+import time
 from os import kill
 from signal import alarm, signal, SIGALRM, SIGKILL
 from subprocess import PIPE, Popen
 
-# usage: python3 smt_tests.py config.json
-
-# fill the path to fit your files' location
-
-solver_list = ['z3', 'stp', 'boolector', 'ppbv']
-'''
-z3
-stp
-ppbv
-boolector
-'''
-
-if os.getlogin() == 'zhangysh1995':  # configure on my local desktop
-	z3_path = '/home/zhangysh1995/work/ppdev/z3/build/z3'
-	stp_path = '/home/zhangysh1995/work/stp/stp/build/stp-2.1.2 --SMTLIB2'
-	pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
-	boolector_path = '/home/zhangysh1995/work/boolector-2.4.1/boolector/bin/boolector --smt2'
-elif os.getlogin() == 'root':  # configure on sbtest1 docker image
-	z3_path = '/root/Solvers/z3-4.5.0/build/z3'
-	stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2 --SMTLIB2'
-	pp_path = '/root/Solvers/ppsat/build-dev/ppbv'
-	boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
-else:
-	print('Wrong user!')
-	exit(-1)
-
-# The factory to create solvers
-class SolverFactory:
-	@staticmethod
-	def create_z3():
-		return Solver('z3', z3_path)
-
-	@staticmethod
-	def create_stp():
-		return Solver('stp', stp_path)
-
-	@staticmethod
-	def create_boolector():
-		return Solver('boolector', boolector_path)
-
-	@staticmethod
-	def create_ppbv():
-		return Solver('ppbv', pp_path)
-
-	def create_all(self):
-		return [self.create_z3(), self.create_stp(),
-				self.create_boolector(), self.create_ppbv()]
-
-
-# To construct solvers
-class Solver:
-	def __init__(self, name, path):
-		self.name = name
-		self.path = path
-		self.results = []
-		self.times = []
-		self.solved = 0
-
-
-# find cnf files in path
-def find_cnf(path):
-	flist = []  # path to DIMACS files
-	for root, dirs, files in os.walk(path):
-		for fname in files:
-			# confirm the file format
-			if os.path.splitext(fname)[1] == '.cnf':
-				flist.append(os.path.join(root, fname))
-	return flist
-
-
-# find smt2 files in path
-def find_smt2(path):
-	flist = []  # path to smtlib2 files
-	if path != None and os.path.exists(path):
-		for root, dirs, files in os.walk(path):  # search the directory
-			for fname in files:
-				if os.path.splitext(fname)[1] == '.smt2':
-					flist.append(os.path.join(root, fname))
-		return flist
-	else:
-		print('Use -h for help')
-		exit(-1)
-
-def split_list(alist, wanted_parts=1):
-	length = len(alist)
-	return [alist[i * length // wanted_parts: (i + 1) * length // wanted_parts]
-			for i in range(wanted_parts)]
-
-
-def find_csv(path):
-	return glob.glob(path + '/*.csv')
-
-# file naming format
-now = time.strftime('%Y-%m-%d-')
-
-
-# filename of csv
-def file(solver):
-	return now + solver + '.csv'
-
-
-def file_withCPU(solver, cpu):
-	return now + solver + str(cpu) + '.csv'
-
-
-# combine files of the same sovler
-def combine_data(cpu=4):
-	for solver in solver_list:
-		outfile = file(solver)
-		for i in range(cpu):
-			with open('Out/' + outfile, 'a+') as f:
-				input = fileinput.input(file_withCPU(solver, i))
-				f.writelines(input)
-				f.flush()
-				f.close()
-	csvs = find_csv(os.getcwd())
-	for csv in csvs:
-		os.remove(csv)
-
-
-# Save results to file
-def output_results_separate(solver, cpu):
-	newfile = file_withCPU(solver.name, cpu)
-	with open(newfile, 'a+', newline='') as csvfile:
-		fieldnames = ['result', 'time']
-		try:
-			spamwriter = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
-			spamwriter.writeheader()
-			for i in range(len(solver.results)):
-				result = solver.results[i]
-				interval = solver.times[i]
-				if result == 'sat':
-					sat = 1
-				else:
-					sat = 0
-				spamwriter.writerow({'result': sat, 'time': interval})
-			# spamwriter.writerow(str(interval))
-			csvfile.close()
-		except IOError as e:
-			print('File I/O error: '.format(e))
-
-# Save results to a huge file
-def output_results(Solvers, cpu):
-	newfile = 'Out/' + now + 'all.csv'
-	data = {}
-	for solver in Solvers:
-		data.update({solver.name: solver.times})
-	df = pd.DataFrame(data)
-	with open(newfile, 'a+') as f:
-		try:
-			if cpu == 0:
-				df.to_csv(f, index=False)
-			else:
-				df.to_csv(f, index=False, header=False)
-			f.close()
-		except IOError as e:
-			print('I/O error when saving results: ').format(e)
-
-# output report
-def output_report(Solvers, cpu):
-	# show results and save
-	with open('results.txt', 'a+') as f:
-		try:
-			for solver in Solvers:
-				print(solver.name + ': ' + str(sum(solver.times)) + ' ' + str(solver.solved))
-				output_results_separate(solver, cpu)
-				f.write(solver.name + ' ' + str(sum(solver.times)) + '\n')
-			f.close()
-		except IOError as e:
-			print('I/O error when saving results: ').format(e)
+from smt_io import find_smt2, split_list, combine_data, output_results_separate, output_results
+from smt_solver import SolverFactory
 
 
 class TestResult:
@@ -311,7 +138,8 @@ def compare_solvers(flist, Solvers, cpu=0):
 			testResult = test_with_solver(solver, fname, 2)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
-	output_report(Solvers, cpu)
+			output_results_separate(solver, cpu)
+	# output_report(Solvers, cpu)
 	output_results(Solvers, cpu)
 	print('Finished!')
 
