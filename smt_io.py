@@ -43,7 +43,7 @@ def split_list(alist, wanted_parts=1):
 
 
 now = time.strftime('%Y-%m-%d-')
-
+prefix = '../Out/'
 
 def file(solver):
 	return now + solver + '.csv'
@@ -55,43 +55,48 @@ def file_withCPU(solver, cpu):
 # combine files of the same sovler
 def combine_data(cpu=4):
 	for solver in solver_list:
-		outfile = file(solver)
+		outfile = prefix + file(solver)
 		for i in range(cpu):
-			with open('Out/' + outfile, 'a+') as f:
-				input = fileinput.input(file_withCPU(solver, i))
-				f.writelines(input)
-				f.flush()
-				f.close()
+			with open(outfile, 'a+') as f:
+				try:
+					input = fileinput.input(file_withCPU(solver, i))
+					f.writelines(input)
+					f.flush()
+					f.close()
+				except IOError as e:
+					print('File I/O error: '.format(e))
 	csvs = find_csv(os.getcwd())
 	for csv in csvs:
 		os.remove(csv)
 
 
 # Save results to file
-def output_results_separate(solver, cpu):
-	newfile = file_withCPU(solver.name, cpu)
-	with open(newfile, 'a+', newline='') as csvfile:
-		fieldnames = ['result', 'time']
-		try:
-			spamwriter = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
-			spamwriter.writeheader()
-			for i in range(len(solver.results)):
-				result = solver.results[i]
-				interval = solver.times[i]
-				if result == 'sat':
-					sat = 1
-				else:
-					sat = 0
-				spamwriter.writerow({'result': sat, 'time': interval})
-			# spamwriter.writerow(str(interval))
-			csvfile.close()
-		except IOError as e:
-			print('File I/O error: '.format(e))
+def output_results_separate(Solvers, cpu):
+	for solver in Solvers:
+		newfile = file_withCPU(solver.name, cpu)
+		with open(newfile, 'a+', newline='') as csvfile:
+			fieldnames = ['result', 'time']
+			try:
+				spamwriter = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
+				if cpu == 0:
+					spamwriter.writeheader()
+
+				for i in range(len(solver.results)):
+					result = solver.results[i]
+					interval = solver.times[i]
+					if result == 'sat':
+						sat = 1
+					else:
+						sat = 0
+					spamwriter.writerow({'result': sat, 'time': interval})
+				csvfile.close()
+			except IOError as e:
+				print('File I/O error: '.format(e))
 
 
 # Save results to a huge file
 def output_results(Solvers, cpu):
-	newfile = '../Out/' + now + 'all.csv'
+	newfile = prefix + now + 'all.csv'
 	data = {}
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
@@ -107,15 +112,8 @@ def output_results(Solvers, cpu):
 			print('I/O error when saving results: ').format(e)
 
 
-# output report
-def output_report(Solvers, cpu):
-	# show results and save
-	with open('results.txt', 'a+') as f:
-		try:
-			for solver in Solvers:
-				print(solver.name + ': ' + str(sum(solver.times)) + ' ' + str(solver.solved))
-				output_results_separate(solver, cpu)
-				f.write(solver.name + ' ' + str(sum(solver.times)) + '\n')
-			f.close()
-		except IOError as e:
-			print('I/O error when saving results: ').format(e)
+def output_cases(flist):
+	# output case names
+	with open('CaseNames.txt', 'w') as CaseNames:
+		for item in flist:
+			CaseNames.write('%s\n' % os.path.split(item)[1])

@@ -4,12 +4,13 @@
 import argparse
 import multiprocessing
 import os
+import sys
 import time
 from os import kill
 from signal import alarm, signal, SIGALRM, SIGKILL
 from subprocess import PIPE, Popen
 
-from smt_io import find_smt2, split_list, combine_data, output_results_separate, output_results
+from smt_io import find_smt2, split_list, combine_data, output_results_separate, output_results, output_cases
 from smt_solver import SolverFactory
 
 
@@ -138,19 +139,15 @@ def compare_solvers(flist, Solvers, cpu=0):
 			testResult = test_with_solver(solver, fname, 2)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
-			output_results_separate(solver, cpu)
-	# output_report(Solvers, cpu)
 	output_results(Solvers, cpu)
+	output_results_separate(Solvers, cpu)
 	print('Finished!')
 
 
 # return z3_time, z3_solved, bo_time, bo_solved, pp_time, pp_solved
 def test_solvers(path, Solvers):
 	flist = find_smt2(path)
-	# output case names
-	with open('CaseNames.txt', 'w') as CaseNames:
-		for item in flist:
-			CaseNames.write('%s\n' % os.path.split(item)[1])
+	output_cases(flist)
 	# run the tests
 	compare_solvers(flist, Solvers)
 
@@ -174,15 +171,19 @@ def test_solver_parallel(flist):
 
 
 # test_solvers(cases, factory.create_all())
-parser = argparse.ArgumentParser(description='SMT solver testing config')
+parser = argparse.ArgumentParser(description='Run single file of smt2 cases')
 parser.add_argument('--configure', type=str, help='point to your customized configurations')
 parser.add_argument('--case', type=str, help='specify smt2 cases directory')
-# args = parser.parse_args()
+args = parser.parse_args()
+#
 # if sys.argv == 1:
 # 	print('Use -h for')
-# if args.case == '':
-# 	test_solver_parallel(cases)
-# else:
-# 	test_solver_parallel(args.case)
-# flist = find_smt2(args.case)
-# test_solver_parallel(flist)
+#
+# # if args.case == '':
+# # 	test_solver_parallel(cases)
+# # else:
+# # 	flist = find_smt2(args.case)
+# # 	test_solver_parallel(flist)
+#
+flist = find_smt2('/home/zhangysh1995/ctags')
+test_solver_parallel(flist)

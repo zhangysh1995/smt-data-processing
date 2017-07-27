@@ -1,29 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
+from smt_io import file
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
 colors = ['g', 'c', 'b', 'r']
 markers = ['x', '^', 's', 'o']
 
-now = time.strftime('Out/%Y-%m-%d-')
-
-def file(solver):
-	return now + solver + '.csv'
-
-
-def file_withCPU(solver, cpu):
-	return now + solver + str(cpu) + '.csv'
-
 
 def single_data(solver):
-	data = np.genfromtxt(file(solver), delimiter=',')
+	data = np.genfromtxt('../Out/' + file(solver), delimiter=',')
 	return data
 
 def	all_data():
 	datas = []
 	for solver in solvers:
-		data = np.genfromtxt(file(solver), delimiter=',')
+		data = np.genfromtxt('../Out/' + file(solver), delimiter=',')
 		datas.append(data)
 	return datas
 
@@ -62,7 +53,7 @@ def time_distri_equal(solver):
 			if interval[i] > time > interval[i-1]:
 				y[i] += 1
 	plt.pie(y/sum(y))
-	plt.show()
+
 
 # pie cahart on non-equal intervals
 def time_distri(solver):
@@ -71,7 +62,7 @@ def time_distri(solver):
 	distri = np.histogram(time[1:], bins=(0.0, 0.02, 0.04, 0.06, 0.08))
 	plt.pie(distri[1], labels=[0.0, 0.01, 0.02, 0.04, 0.06])
 	plt.legend()
-	plt.show()
+
 
 # distribution of time vs. solved instance
 def	time_solved(instances, tick):
@@ -90,4 +81,3 @@ def	time_solved(instances, tick):
 	plt.ylabel('time')
 	plt.title('Time to solve an instance')
 	plt.legend()
-	plt.show()
