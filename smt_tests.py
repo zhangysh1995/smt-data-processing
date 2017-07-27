@@ -185,8 +185,8 @@ if args.case == '':
 	flist = find_smt2(cases)
 	test_solver_parallel(cases)
 else:
- 	flist = find_smt2(args.case)
- 	test_solver_parallel(flist)
+	flist = find_smt2(args.case)
+	test_solver_parallel(flist)
 
 # flist = find_smt2('/home/zhangysh1995/ctags')
 # test_solver_parallel(flist)

@@ -42,6 +42,21 @@ def split_list(alist, wanted_parts=1):
 			for i in range(wanted_parts)]
 
 
+# find corresponding dir and filename for cases
+def out_by_class(path):
+	dir = ''
+	piece = path.split('/')
+	if 'KLEE' in piece:
+		dir = 'KLEE'
+	elif 'PP-CASE' in piece:
+		dir = 'PP-CASE'
+	elif 'SAGE' in piece:
+		dir = 'SAGE'
+	name = path[path.index(dir):].replace('/', '-')
+
+	return [dir, name]
+
+
 now = time.strftime('%Y-%m-%d-')
 prefix = '../Out/'
 

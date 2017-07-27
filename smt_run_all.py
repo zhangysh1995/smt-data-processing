@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Run all your smt2 cases via all so
 parser.add_argument('--case', type=str, help='absolute path to your test cases root directory')
 args = parser.parse_args()
 
-if args.case == None:
+if args.case == '':
 	if pwd.getpwuid(os.geteuid()).pw_name == 'zhangysh1995':
 		split_project('/home/zhangysh1995/ctags')
 	elif pwd.getpwuid(os.geteuid()).pw_name == 'root':
