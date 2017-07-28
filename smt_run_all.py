@@ -2,6 +2,7 @@ import os
 import pwd
 import argparse
 import smt_tests as st
+from tools.ssh import scp_csv
 
 
 def split_project(entrance):
@@ -30,3 +31,5 @@ if args.case == '':
 		split_project('/root/PPBV')
 else:
 	split_project(args.case)
+
+scp_csv()
