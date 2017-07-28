@@ -54,8 +54,8 @@ def file_prefix(path):
 	elif 'sage' in piece:
 		dir = 'sage'
 	# for local tests
-	elif 'ctags' in piece:
-		dir='ctags'
+	# elif 'ctags' in piece:
+	# 	dir='ctags'
 	# whole prefix
 	name = path[path.index(dir)+len(dir)+1:].replace('/', '-')
 	return '../Out/' + os.path.join(dir, name)
@@ -121,7 +121,7 @@ def output_results(Solvers, cpu, path):
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
 	df = pd.DataFrame(data)
-	with open(newfile, 'w+') as f:
+	with open(newfile, 'a+') as f:
 		try:
 			if cpu == 0:
 				df.to_csv(f, index=False)
