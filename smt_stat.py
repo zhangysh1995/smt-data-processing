@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 from smt_io import file
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
-colors = ['g', 'c', 'b', 'r']
-markers = ['x', '^', 's', 'o']
+colors = ['g', 'c', 'b', 'r', 'y']
+markers = ['x', '^', 's', 'o', '+']
 
 
 def single_data(solver):
