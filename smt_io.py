@@ -43,22 +43,26 @@ def split_list(alist, wanted_parts=1):
 
 
 # find corresponding dir and filename for cases
-def out_by_class(path):
+# **ugly implementation**
+def file_prefix(path):
 	dir = ''
 	piece = path.split('/')
 	if 'KLEE' in piece:
 		dir = 'KLEE'
 	elif 'PP-CASE' in piece:
 		dir = 'PP-CASE'
-	elif 'SAGE' in piece:
-		dir = 'SAGE'
-	name = path[path.index(dir):].replace('/', '-')
-
-	return [dir, name]
+	elif 'sage' in piece:
+		dir = 'sage'
+	# for local tests
+	elif 'ctags' in piece:
+		dir='ctags'
+	# whole prefix
+	name = path[path.index(dir)+len(dir)+1:].replace('/', '-')
+	return '../Out/' + os.path.join(dir, name)
 
 
 now = time.strftime('%Y-%m-%d-')
-prefix = '../Out/'
+
 
 def file(solver):
 	return now + solver + '.csv'
@@ -67,10 +71,11 @@ def file(solver):
 def file_withCPU(solver, cpu):
 	return now + solver + str(cpu) + '.csv'
 
+
 # combine files of the same sovler
-def combine_data(cpu=4):
+def combine_data(cpu=4, path=''):
 	for solver in solver_list:
-		outfile = prefix + file(solver)
+		outfile = file_prefix(path) + file(solver)
 		for i in range(cpu):
 			with open(outfile, 'a+') as f:
 				try:
@@ -110,13 +115,13 @@ def output_results_separate(Solvers, cpu):
 
 
 # Save results to a huge file
-def output_results(Solvers, cpu):
-	newfile = prefix + now + 'all.csv'
+def output_results(Solvers, cpu, path):
+	newfile = file_prefix(path) + now + 'all.csv'
 	data = {}
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
 	df = pd.DataFrame(data)
-	with open(newfile, 'a+') as f:
+	with open(newfile, 'w+') as f:
 		try:
 			if cpu == 0:
 				df.to_csv(f, index=False)

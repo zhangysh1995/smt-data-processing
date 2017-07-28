@@ -139,8 +139,8 @@ def compare_solvers(flist, Solvers, cpu=0):
 			testResult = test_with_solver(solver, fname, 2)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
-	output_results(Solvers, cpu)
-	output_results_separate(Solvers, cpu)
+	output_results(Solvers, cpu, os.path.split(flist[0])[0] + '/')
+	# output_results_separate(Solvers, cpu)
 	print('Finished!')
 
 
@@ -167,26 +167,26 @@ def test_solver_parallel(flist):
 	pool.close()
 	pool.join()
 	print('All Finished!')
-	combine_data(cpus)
+	# combine_data(cpus)
 
-cases = '/root/PP_CASE/curl'
+# cases = '/root/PP_CASE/curl'
 
-# test_solvers(cases, factory.create_all())
-parser = argparse.ArgumentParser(description='Run single file of smt2 cases')
-parser.add_argument('--configure', type=str, help='point to your customized configurations')
-parser.add_argument('--case', type=str, help='specify smt2 cases directory')
-args = parser.parse_args()
-
-# if sys.argv == 1:
-# 	print('Use -h for')
-# 	exit(0)
-
-if args.case == '':
-	flist = find_smt2(cases)
-	test_solver_parallel(cases)
-else:
-	flist = find_smt2(args.case)
-	test_solver_parallel(flist)
+# # test_solvers(cases, factory.create_all())
+# parser = argparse.ArgumentParser(description='Run single file of smt2 cases')
+# parser.add_argument('--configure', type=str, help='point to your customized configurations')
+# parser.add_argument('--case', type=str, help='specify smt2 cases directory')
+# args = parser.parse_args()
+#
+# # if sys.argv == 1:
+# # 	print('Use -h for')
+# # 	exit(0)
+#
+# if args.case == '':
+# 	flist = find_smt2(cases)
+# 	test_solver_parallel(cases)
+# else:
+# 	flist = find_smt2(args.case)
+# 	test_solver_parallel(flist)
 
 # flist = find_smt2('/home/zhangysh1995/ctags')
 # test_solver_parallel(flist)
