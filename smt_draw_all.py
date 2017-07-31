@@ -3,7 +3,7 @@ from smt_stat import solvers
 import smt_analyze as sal
 from smt_draw import hist_t_query
 
-path = '../Out/app1-2017-07-28-all.csv'
+path = 'resultsample/dircolors-2017-07-28-all.csv'
 
 index = range(len(solvers))
 fig, axes = plt.subplots(nrows=4)
@@ -16,7 +16,6 @@ def multi_time_query():
 
 # def multi_time:
 
-# TODO: fix multiple window bug
 multi_time_query()
 plt.show()
 
