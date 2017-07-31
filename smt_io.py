@@ -36,6 +36,16 @@ def find_csv(path):
 	return glob.glob(path + '/*.csv')
 
 
+def find_csv_depth(path):
+	flist = []  # path to DIMACS files
+	for root, dirs, files in os.walk(path):
+		for fname in files:
+			# confirm the file format
+			if os.path.splitext(fname)[1] == '.csv':
+				flist.append(os.path.join(root, fname))
+	return flist
+
+
 def split_list(alist, wanted_parts=1):
 	length = len(alist)
 	return [alist[i * length // wanted_parts: (i + 1) * length // wanted_parts]
@@ -117,7 +127,7 @@ def output_results_separate(Solvers, cpu):
 def output_results(Solvers, path):
 	newfile = file_prefix(path) + now + 'all.csv'
 
-	if(os.path.exists(now)):
+	if(os.path.isfile(newfile)):
 		header = False
 	else:
 		header = True
