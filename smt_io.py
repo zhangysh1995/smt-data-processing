@@ -125,24 +125,36 @@ def output_results_separate(Solvers, cpu):
 
 # Save results to a huge file
 def output_results(Solvers, path):
-	newfile = file_prefix(path) + now + 'all.csv'
-
-	if(os.path.isfile(newfile)):
+	newfile1 = file_prefix(path) + now + 'all-time.csv'
+	newfile2 = file_prefix(path) + now + 'all-result.csv'
+	if(os.path.isfile(newfile1)):
 		header = False
 	else:
 		header = True
 
+	# save time
 	data = {}
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
 	df = pd.DataFrame(data)
-	with open(newfile, 'a+') as f:
+	with open(newfile1, 'a+') as f:
 		try:
 			df.to_csv(f, index=False, header=header)
 			f.close()
 		except IOError as e:
-			print('I/O error when saving results: ').format(e)
+			print('I/O error when saving results: ')
+	data.clear()
 
+	#save results
+	for solver in Solvers:
+		data.update({solver.name: solver.results})
+	df = pd.DataFrame(data)
+	with open(newfile2, 'a+') as f:
+		try:
+			df.to_csv(f, index=False, header=header)
+			f.close()
+		except IOError as e:
+			print('I/O error when saving results: ')
 
 def output_cases(flist):
 	# output case names
