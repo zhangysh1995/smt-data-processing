@@ -127,6 +127,8 @@ def output_results_separate(Solvers, cpu):
 def output_results(Solvers, path):
 	newfile1 = file_prefix(path) + now + 'all-time.csv'
 	newfile2 = file_prefix(path) + now + 'all-result.csv'
+
+	# TODO: multicore variable competition here for `header`
 	if(os.path.isfile(newfile1)):
 		header = False
 	else:

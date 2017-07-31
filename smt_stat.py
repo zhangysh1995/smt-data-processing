@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from smt_io import file
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
-colors = ['g', 'c', 'b', 'r', 'y']
+colors = ['g', 'c', 'b', 'r', 'y', 'orange', 'grey']
 markers = ['x', '^', 's', 'o', '+']
 
 

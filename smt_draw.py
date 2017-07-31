@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import smt_stat as stat
 import matplotlib.style
 # TODO: plotting styles
-# matplotlib.style.use('seaborn-paper')
-matplotlib.style.use('ggplot')
+matplotlib.style.use('seaborn-paper')
+# matplotlib.style.use('ggplot')
 
 # setup plt
 # fig, ax1 = plt.subplots()
@@ -52,7 +52,7 @@ def draw_hist_time(df, ax):
 		time.append(df[df < ticks[i]].sum())
 		color = stat.colors[i]
 		if i == 0:
-			time[i].plot.bar(ax=ax, color=color, width=width, position=1)
+			time[i].plot.bar(x=ax, color=color, width=width, position=1)
 		else:
 			(time[i] - time[i - 1]).plot.bar(bottom=time[i - 1],
 											 ax=ax, color=color, width=width, position=1)
@@ -64,14 +64,14 @@ def time_sovled(data):
 	df = pd.DataFrame(data)
 	df.cumsum().plot()
 
-# TODO: automatic drawing/saving
+
 '''
 draw combined graph of query types
 and corresponding running time
 '''
-def hist_t_query_all(data):
-	hist_query_all(data)
-	hist_time_all(data)
+def hist_t_query_all(data, ax):
+	hist_query_all(data, ax)
+	hist_time_all(data, ax)
 
 
 def hist_t_query(data, solver, ax):
