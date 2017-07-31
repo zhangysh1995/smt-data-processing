@@ -113,20 +113,22 @@ def output_results_separate(Solvers, cpu):
 			except IOError as e:
 				print('File I/O error: '.format(e))
 
-
 # Save results to a huge file
-def output_results(Solvers, cpu, path):
+def output_results(Solvers, path):
 	newfile = file_prefix(path) + now + 'all.csv'
+
+	if(os.path.exists(now)):
+		header = False
+	else:
+		header = True
+
 	data = {}
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
 	df = pd.DataFrame(data)
 	with open(newfile, 'a+') as f:
 		try:
-			if cpu == 0:
-				df.to_csv(f, index=False)
-			else:
-				df.to_csv(f, index=False, header=False)
+			df.to_csv(f, index=False, header=header)
 			f.close()
 		except IOError as e:
 			print('I/O error when saving results: ').format(e)

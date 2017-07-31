@@ -139,7 +139,7 @@ def compare_solvers(flist, Solvers, cpu=0):
 			testResult = test_with_solver(solver, fname, 2)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
-	output_results(Solvers, cpu, os.path.split(flist[0])[0] + '/')
+	output_results(Solvers, os.path.split(flist[0])[0] + '/')
 	# output_results_separate(Solvers, cpu)
 	print('Finished!')
 
