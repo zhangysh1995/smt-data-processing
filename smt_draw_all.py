@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
+import matplotlib.style
+# matplotlib.style.use('seaborn-paper')
 from smt_stat import solvers
-import smt_stat as stat
 import smt_analyze as sal
 from smt_draw import hist_t_query
+from smt_draw import time_sovled
 import smt_io as sio
 import pandas as pd
 import numpy as np
@@ -12,56 +14,79 @@ import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 
-fig, axes = plt.subplots(nrows=4)
+xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
+x = np.arange(0, 30, 5)
+dc = pd.DataFrame({'x': x, 'y': x})
 
-def multi_time_query(csv):
+# get project from filename
+def get_name(path):
+	file = os.path.split(path)[1]
+	return file[:file.find('-2017')]
+
+
+def multi_time_query(csv, axis):
 	index = range(len(solvers))
 	data = sal.read_data(csv)
 	for solver in solvers:
 		bin = index[solvers.index(solver)]
-		hist_t_query(data, solver, ax=axes[bin])
+		hist_t_query(data, solver, ax=axis[bin])
 
 
 def all_time_query(path):
+	fig, axes = plt.subplots(nrows=4)
 	csv = sio.find_csv_depth(path)
 	for axis in axes:
 		axis.set_xticks(range(len(csv)))
 	for c in csv:
-		multi_time_query(c)
-
-
-# all_time_query('../Out')
-# plt.show()
+		multi_time_query(c, axes)
 
 
 # combine time for one set
 # TODO: markers and axis
-def draw_comb_time(path):
-	draw_time(cat_data(path))
+def comb_time_all():
+	for dir in dirs:
+		draw_time(sio.cat_data(dir), dir)
 
 
 # cumsum time
-def draw_time(data):
+def draw_time(data, dir = ''):
+	fig, axis = plt.subplots()
 	df = pd.DataFrame(data)
 	cumsum = []
 	ticks = [i for i in np.linspace(0, 10000, 51)]
 	for i in ticks:
 		cumsum.append(df.iloc[:int(i)].sum())
-	d = pd.DataFrame(cumsum)
-	d.plot()
-	# d.plot()
+	# d = pd.DataFrame(cumsum)
+	# ax = d.plot(xticks=ticks)
+	# fig = ax.get_figure()
+	# fig.savefig('../plots/' + dir.split('/').pop() + '.png')
+	plt.plot(ticks, cumsum)
+	plt.savefig(dir.split('/').pop() + '.png')
 
 
-# cat data for one set together
-def cat_data(path):
-	csv = sio.find_csv(path)
-	csv_all = [pd.read_csv(f) for f in csv]
-	df = [pd.DataFrame(d) for d in csv_all]
-	data = pd.concat(df)
-	return data
 
-
+# draw separately
 def comp_time(path):
+	project = path.split('/').pop()
+	csv = glob.glob(path + '/*.csv')
+	fig, ax = plt.subplots()
+
+	for c in csv:
+		for solver in solvers:
+			if solver == 'ppbv':
+				continue
+			df = pd.DataFrame(pd.read_csv(c))
+			index = csv.index(c)
+			print(index, solver, c)
+			ax.set_xlim([0, 30])
+			ax.set_ylim([0, 30])
+			ax.set_xticks([0, 1, 5, 15, 30])
+			df.plot.scatter(x=solver, y='ppbv', style='gx', ax=ax)
+			dc.plot(x='x', y='y', legend=False, style='k', ax=ax)
+			plt.savefig('../plots/'+ project + '/' + solver + '-' + os.path.split(c)[1] + '.png')
+
+
+def comp_time_project(path):
 	project = path.split('/').pop()
 	csv = glob.glob(path + '/*.csv')
 	fig, axis = plt.subplots(ncols=3)
@@ -87,8 +112,6 @@ def comp_time_matrix(path):
 	fig, axis = plt.subplots(nrows=int(rows), ncols=int(rows))
 
 	out = pd.DataFrame(csv)
-	x = np.arange(0, 2.0, 0.5)
-	dc = pd.DataFrame({'x': x, 'y': x})
 
 	for solver in solvers:
 		if solver == 'ppbv':
@@ -103,19 +126,76 @@ def comp_time_matrix(path):
 			df.plot.scatter(x=solver, y='ppbv', ax=ax)
 			# dc.plot(x='x', y='y', ax=ax, legend=False, style='rx:')
 		plt.savefig('../plots/'+ project + '-original-' + solver)
+		plt.close()
+
+
+def time_query_project(path):
+	fig, axis = plt.subplots(nrows=4)
+	csv = sio.find_csv(path)
+	data = {}
+
+	for solver in solvers:
+		for c in csv:
+			df = pd.DataFrame(pd.read_csv(c), columns=[solver])
+			data.update({get_name(c): df.to_dict()[solver]})
+		df = pd.DataFrame.from_dict(data, orient='columns')
+		ax = axis[solvers.index(solver)]
+		ax.set_ylabel(solver)
+		hist_t_query(df[df < 30], ax)
+
+
+'''
+wrappers for functions beyond
+'''
+
 
 # draw for all projects
 def comp_time_all():
 	for dir in dirs:
 		comp_time_matrix(dir)
 
+
 # draw for single projects
 def comp_time_single():
 	for dir in dirs:
+		comp_time_project(dir)
+
+
+# draw single plots
+def comp_time_all_single():
+	for dir in dirs:
 		comp_time(dir)
 
-# draw_comb_time('../Out/KLEE')
+
+# draw cumsum vs. time
+def time_solved_all():
+	for dir in dirs:
+		time_sovled(sio.cat_data(dir))
+		plt.savefig('../plots/' + dir.split('/')[1] + '.png')
+
+
+# draw time_query
+def time_query():
+	for dir in dirs:
+		time_query_project(dir)
+		plt.savefig('../plots/' + dir.split('/')[1])
+
+# draw time&query vs. solved
+# def time_query_all():
+
+
+'''
+Below are usages
+'''
+
+# comb_time_all()
 # plt.show()
 
 # comp_time_all()
 # comp_time_single()
+# comp_time_all_single()
+# time_solved_all()
+# time_query_project('../Out/KLEE')
+
+time_query()
+plt.show()

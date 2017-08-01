@@ -16,9 +16,9 @@ def hist_query_all(data, ax):
 	draw_hist_query(df, ax)
 
 
-def hist_query(data, solver, ax):
-	solver_data = pd.DataFrame(data).as_matrix(columns=[solver])
-	draw_hist_query(pd.DataFrame(solver_data), ax)
+# def hist_query(data, solver, ax):
+# 	solver_data = pd.DataFrame(data).as_matrix(columns=[solver])
+# 	draw_hist_query(pd.DataFrame(solver_data), ax)
 
 
 def draw_hist_query(df, ax):
@@ -40,9 +40,9 @@ def hist_time_all(data, ax):
 	draw_hist_time(df, ax)
 
 
-def hist_time(data, solver, ax):
-	solver_data = pd.DataFrame(data).as_matrix(columns=[solver])
-	draw_hist_time(pd.DataFrame(solver_data), ax)
+# def hist_time(data, solver, ax):
+# 	solver_data = pd.DataFrame(data).as_matrix(columns=[solver])
+# 	draw_hist_time(pd.DataFrame(solver_data), ax)
 
 
 def draw_hist_time(df, ax):
@@ -51,7 +51,8 @@ def draw_hist_time(df, ax):
 		time.append(df[df < ticks[i]].sum())
 		color = stat.colors[i]
 		if i == 0:
-			time[i].plot.bar(x=ax, color=color, width=width, position=1)
+			# print(time[i])
+			time[i].plot.bar(ax=ax, color=color, width=width, position=1)
 		else:
 			(time[i] - time[i - 1]).plot.bar(bottom=time[i - 1],
 											 ax=ax, color=color, width=width, position=1)
@@ -73,7 +74,6 @@ def hist_t_query_all(data, ax):
 	hist_time_all(data, ax)
 
 
-def hist_t_query(data, solver, ax):
-	hist_query(data, solver, ax)
-	hist_time(data, solver, ax)
-
+def hist_t_query(data, ax):
+	draw_hist_query(data, ax)
+	draw_hist_time(data,ax)
