@@ -46,6 +46,14 @@ def find_csv_depth(path):
 	return flist
 
 
+
+# cat data for one set together
+def cat_data(path):
+	csv = find_csv(path)
+	data = pd.concat((pd.read_csv(f) for f in csv), ignore_index=True)
+	return data
+
+
 def split_list(alist, wanted_parts=1):
 	length = len(alist)
 	return [alist[i * length // wanted_parts: (i + 1) * length // wanted_parts]

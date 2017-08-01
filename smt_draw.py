@@ -1,5 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import smt_stat as stat
 import matplotlib.style
 # TODO: plotting styles
@@ -62,7 +61,7 @@ def draw_hist_time(df, ax):
 # TODO: make it pretty
 def time_sovled(data):
 	df = pd.DataFrame(data)
-	df.cumsum().plot()
+	df[df < 30].cumsum().plot()
 
 
 '''
