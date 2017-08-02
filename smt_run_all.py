@@ -14,7 +14,7 @@ def split_project(entrance):
 					split_project(dir.pop())
 			else:
 				print('\n\n===== Tests under folder ' + path + ' =====')
-				file = [os.path.join(path, f) for f in file]
+				file = [os.path.join(path, f) for f in file if f.split('.')[1] == 'smt2']
 				st.test_solver_parallel(file)
 			return
 	else:

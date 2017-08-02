@@ -24,23 +24,6 @@ def get_name(path):
 	return file[:file.find('-2017')]
 
 
-def multi_time_query(csv, axis):
-	index = range(len(solvers))
-	data = sal.read_data(csv)
-	for solver in solvers:
-		bin = index[solvers.index(solver)]
-		hist_t_query(data, solver, ax=axis[bin])
-
-
-def all_time_query(path):
-	fig, axes = plt.subplots(nrows=4)
-	csv = sio.find_csv_depth(path)
-	for axis in axes:
-		axis.set_xticks(range(len(csv)))
-	for c in csv:
-		multi_time_query(c, axes)
-
-
 # combine time for one set
 # TODO: markers and axis
 def comb_time_all():
@@ -170,15 +153,20 @@ def comp_time_all_single():
 # draw cumsum vs. time
 def time_solved_all():
 	for dir in dirs:
+		folder = dir.split('/').pop()
+		plt.title(folder)
+		plt.xlabel('Solved instances')
+		plt.ylabel('Cumulative running time/s')
 		time_sovled(sio.cat_data(dir))
-		plt.savefig('../plots/' + dir.split('/')[1] + '.png')
-
+		plt.savefig('../plots/' + folder + '-time-solved.png')
+#
 
 # draw time_query
 def time_query():
 	for dir in dirs:
+		folder = dir.split('/').pop()
 		time_query_project(dir)
-		plt.savefig('../plots/' + dir.split('/')[1])
+		plt.savefig('../plots/' + folder + '-time-query')
 
 # draw time&query vs. solved
 # def time_query_all():
