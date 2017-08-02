@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import matplotlib.style
-# matplotlib.style.use('seaborn-paper')
+matplotlib.style.use('seaborn-paper')
+from matplotlib import gridspec
+import matplotlib.ticker as mtick
 from smt_stat import solvers
-import smt_analyze as sal
 from smt_draw import hist_t_query
 from smt_draw import time_sovled
 import smt_io as sio
@@ -16,13 +17,21 @@ dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
 x = np.arange(0, 30, 5)
-dc = pd.DataFrame({'x': x, 'y': x})
+equal = pd.DataFrame({'x': x, 'y': x})
+double = pd.DataFrame({'x': x, 'y': x * 2})
+half = pd.DataFrame({'x': x, 'y': x * 1/2})
 
 # get project from filename
 def get_name(path):
 	file = os.path.split(path)[1]
 	return file[:file.find('-2017')]
 
+
+# draw reference liens
+def draw_refe(ax):
+	equal.plot(x='x', y='y', legend=False, style='r--', ax=ax)
+	double.plot(x='x', y= 'y', legend=False, style='g--', ax=ax)
+	half.plot(x='x', y = 'y', legend=False, style='g--', ax=ax)
 
 # combine time for one set
 # TODO: markers and axis
@@ -64,8 +73,9 @@ def comp_time(path):
 			ax.set_xlim([0, 30])
 			ax.set_ylim([0, 30])
 			ax.set_xticks([0, 1, 5, 15, 30])
-			df.plot.scatter(x=solver, y='ppbv', style='gx', ax=ax)
-			dc.plot(x='x', y='y', legend=False, style='k', ax=ax)
+			df.plot(kind='scatter', x=solver, y='ppbv',  ax=ax, legend=False,
+					color='k', marker='x')
+			draw_refe(ax)
 			plt.savefig('../plots/'+ project + '/' + solver + '-' + os.path.split(c)[1] + '.png')
 
 
@@ -113,19 +123,24 @@ def comp_time_matrix(path):
 
 
 def time_query_project(path):
-	fig, axis = plt.subplots(nrows=4)
 	csv = sio.find_csv(path)
-	data = {}
+	# create shared x-axis
+	gs = gridspec.GridSpec(4, 1)
+	ax0 = plt.subplot(gs[0])
 
+	fmt = '%.0f%%'
+	yticks = mtick.FormatStrFormatter(fmt)
+
+	data = {}
 	for solver in solvers:
 		for c in csv:
 			df = pd.DataFrame(pd.read_csv(c), columns=[solver])
 			data.update({get_name(c): df.to_dict()[solver]})
 		df = pd.DataFrame.from_dict(data, orient='columns')
-		ax = axis[solvers.index(solver)]
+		ax = plt.subplot(gs[solvers.index(solver)], sharex=ax0)
+		ax.yaxis.set_major_formatter(yticks)
 		ax.set_ylabel(solver)
-		hist_t_query(df[df < 30], ax)
-
+		hist_t_query(df, ax)
 
 '''
 wrappers for functions beyond
@@ -167,7 +182,6 @@ def time_query():
 		folder = dir.split('/').pop()
 		time_query_project(dir)
 		plt.savefig('../plots/' + folder + '-time-query')
-
 # draw time&query vs. solved
 # def time_query_all():
 
@@ -186,4 +200,5 @@ Below are usages
 # time_query_project('../Out/KLEE')
 
 time_query()
-plt.show()
+
+# comp_time('../Out/KLEE')
