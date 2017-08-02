@@ -1,10 +1,10 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
+from smt_draw_all import colors, markers
 from smt_io import file
+
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
-colors = ['g', 'c', 'b', 'r', 'y', 'orange', 'grey']
-markers = ['x', '^', 's', 'o', '+']
 
 
 def single_data(solver):
@@ -81,3 +81,4 @@ def	time_solved(instances, tick):
 	plt.ylabel('time')
 	plt.title('Time to solve an instance')
 	plt.legend()
+

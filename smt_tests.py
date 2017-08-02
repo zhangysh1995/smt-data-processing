@@ -167,6 +167,7 @@ def test_solver_parallel(flist):
 	pool.close()
 	pool.join()
 	print('All Finished!')
+	output_cases(flist)
 	# combine_data(cpus)
 
 # cases = '/root/PP_CASE/curl'
