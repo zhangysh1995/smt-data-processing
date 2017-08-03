@@ -4,7 +4,7 @@ import smt_io as sio
 import os
 
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
-dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
+dirs = ['sage', 'KLEE', 'PP-CASE']
 
 # conut queries
 def count_queries(path):
@@ -19,12 +19,13 @@ def count_queries(path):
 				# write_table(dir_name(path) + ',' + str(len(file)) + '\n')
 				write_table(dir_name(path) + ' & ' + str(len(file)) + ' & ')
 				solver_table(path + '/')
+			return
 	else:
 		print('Directory Missing ' + path)
 
 
 def write_table(line):
-	with open('/home/zhangysh1995/work/results/Out/table.txt', 'a+') as f:
+	with open('/home/zhangysh1995/work/results/Out/Table3.txt', 'a+') as f:
 		try:
 			f.write(str(line))
 			f.close()
@@ -62,14 +63,14 @@ def solver_table(path):
 		# print solved instance
 		data = pd.read_csv(results)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df[solver].str.contains('sat')].count().to_csv(index=False, sep=' ')
+		line += df[df[solver].str.contains('sat')].count().to_string(index=False)
 		line += ' & '
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df <= 30.0].sum().to_csv(index=False, sep=' ')
-		line += ' && \\\\'
-	write_table(line )
+		line += df[df <= 30.0].sum().to_string(index=False)
+		line += ' && '
+	write_table(line + '\\\\\n')
 
 
 def dir_table(path):
@@ -78,10 +79,11 @@ def dir_table(path):
 
 def all_table():
 	for dir in dirs:
-		dir_table(dir)
+		dir_table('/home/zhangysh1995/PPBV/'+ dir)
 
 
 # dir_name('/home/zhangysh1995/ctags/KLEE/test')
 # count_queries('/home/zhangysh1995/PPBV')
 abs = '/home/zhangysh1995/work/results/Out/'
-dir_table('/home/zhangysh1995/PPBV/sage')
+# dir_table('/home/zhangysh1995/PPBV/sage')
+all_table()
