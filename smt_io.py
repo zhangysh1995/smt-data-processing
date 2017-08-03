@@ -71,12 +71,19 @@ def file_prefix(path):
 		dir = 'PP-CASE'
 	elif 'sage' in piece:
 		dir = 'sage'
-	# for local tests
-	# elif 'ctags' in piece:
-	# 	dir='ctags'
-	# whole prefix
-	name = path[path.index(dir)+len(dir)+1:].replace('/', '-')
-	return '../Out/' + os.path.join(dir, name)
+
+	return dir, path[path.index(dir)+len(dir)+1:].replace('/', '-')
+
+
+def file_prefix_rela(path):
+	prefix = file_prefix(path)
+	return '../Out/' + os.path.join(prefix[0], prefix[1])
+
+
+def file_prefix_abs(path):
+	prefix = file_prefix(path)
+	print(file)
+	return os.path.join(prefix[0], prefix[1])
 
 
 now = time.strftime('%Y-%m-%d-')
@@ -93,7 +100,7 @@ def file_withCPU(solver, cpu):
 # combine files of the same sovler
 def combine_data(cpu=4, path=''):
 	for solver in solver_list:
-		outfile = file_prefix(path) + file(solver)
+		outfile = file_prefix_rela(path) + file(solver)
 		for i in range(cpu):
 			with open(outfile, 'a+') as f:
 				try:
@@ -133,8 +140,8 @@ def output_results_separate(Solvers, cpu):
 
 # Save results to a huge file
 def output_results(Solvers, path):
-	newfile1 = file_prefix(path) + now + 'all-time.csv'
-	newfile2 = file_prefix(path) + now + 'all-result.csv'
+	newfile1 = file_prefix_rela(path) + now + 'all-time.csv'
+	newfile2 = file_prefix_rela(path) + now + 'all-result.csv'
 
 	# TODO: multicore variable competition here for `header`
 	if(os.path.isfile(newfile1)):
