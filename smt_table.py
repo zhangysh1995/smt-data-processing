@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import smt_io as sio
-from smt_io import file_prefix_abs
 import os
 
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
@@ -18,9 +17,8 @@ def count_queries(path):
 			else:
 				file =[f for f in file if f.split('.')[1] == 'smt2']
 				# write_table(dir_name(path) + ',' + str(len(file)) + '\n')
-				write_table(dir_name(path) + ' ' + str(len(file)))
+				write_table(dir_name(path) + ' & ' + str(len(file)) + ' & ')
 				solver_table(path + '/')
-				# print(path)
 	else:
 		print('Directory Missing ' + path)
 
@@ -28,7 +26,7 @@ def count_queries(path):
 def write_table(line):
 	with open('/home/zhangysh1995/work/results/Out/table.txt', 'a+') as f:
 		try:
-			f.write(line)
+			f.write(str(line))
 			f.close()
 		except FileNotFoundError:
 			print('Error when saving result!')
@@ -49,25 +47,29 @@ def dir_name(path):
 
 
 def results_file(path):
-	return abs + file_prefix_abs(path) + sio.now + 'all-result.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-result.csv'
 
 
 def times_file(path):
-	return abs + file_prefix_abs(path) + sio.now + 'all-time.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
 
 
 def solver_table(path):
 	results = results_file(path)
 	times = times_file(path)
-
+	line = ''
 	for solver in solvers:
+		# print solved instance
 		data = pd.read_csv(results)
 		df = pd.DataFrame(data, columns=[solver])
-		write_table(df[df == 'unsat' or df == 'sat'].count(axis=0))
+		line += df[df[solver].str.contains('sat')].count().to_csv(index=False, sep=' ')
+		line += ' & '
+		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
-		write_table(df[df <= 30.0].sum())
-	write_table('\n')
+		line += df[df <= 30.0].sum().to_csv(index=False, sep=' ')
+		line += ' && \\\\'
+	write_table(line )
 
 
 def dir_table(path):
