@@ -13,12 +13,12 @@ import glob
 import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
-solvers = ['z3', 'stp', 'boolector', 'ppbv']
+solvers = ['boolector','ppbv','stp','z3']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
 ticks = [0.1, 1.0, 2.0, 15, 35]
 colors = ['g', 'c', 'b', 'r', 'y']
-markers = ['x', '^', 's', 'o', '+']
+markers = ['d', '^', 's', 'o', 'x']
 width=0.2
 
 x = np.arange(0, 30, 5)
@@ -48,20 +48,47 @@ def comb_time_all():
 
 #
 def time_sovled(data):
-	df = pd.DataFrame(data)
-	rows, columns = df.shape
-	X = np.linspace(0, rows, 51)
-	X = [int(x) for x in X]
-	cumsum = []
-	for i in X:
-		cumsum.append(df.loc[:i].sum())
+	# rows, columns = df.shape
+	# X = np.linspace(0, rows, 51)
+	# X = [int(x) for x in X]
+	# cumsum = []
+	# for i in X:
+	# 	cumsum.append(df.loc[:i].sum())
+	# d = pd.DataFrame(cumsum)
+	# for solver in solvers:
+	# 	index = solvers.index(solver)
+	# 	ax = d[solver].plot(color=colors[index], marker=markers[index], markersize=3)
+	# 	ax.set_xticklabels(X*10)
 
-	d = pd.DataFrame(cumsum)
-	for solver in solvers:
-		index = solvers.index(solver)
-		ax = d[solver].plot(color=colors[index], marker=markers[index], markersize=3)
-		ax.set_xticklabels(X*10)
+	# write all data to tmp file
+	with open('all.csv', 'w+') as f:
+		csv = pd.DataFrame(data).to_csv(header=True, index=False)
+		f.write(csv)
+		f.close()
 
+	times = []
+	datas = np.genfromtxt('all.csv', skip_header=1, delimiter=',')
+	for data in datas.T:
+		times.append(data)
+	rows = len(times[1])
+	Xticks =[int(x) for x in np.linspace(0, rows, 51)]
+
+	index = 0
+	for time in times:
+		# print(time)
+		cumsum = []
+		for tick in Xticks:
+			cumsum.append(sum(time[1:int(tick)]))
+		plt.xlim(0, rows+500)
+		# plt.ylim(0, sum(time))
+		plt.plot(Xticks, cumsum, label=solvers[index], color=colors[index], marker=markers[index], markersize=5)
+		index += 1
+
+	plt.legend()
+
+	# clean working directory
+	# file = glob.glob('*.csv')
+	# os.remove(file)
 
 def hist_t_query(df, ax):
 	count = []
@@ -166,8 +193,6 @@ def comp_time_matrix(path):
 	rows = math.ceil(math.sqrt(len(csv)))
 	fig, axis = plt.subplots(nrows=int(rows), ncols=int(rows))
 
-	out = pd.DataFrame(csv)
-
 	for solver in solvers:
 		if solver == 'ppbv':
 			continue
@@ -179,7 +204,6 @@ def comp_time_matrix(path):
 			# ax.set_title(os.path.split(c)[1])
 			ax.set_xticks([0, 0.1, 0.3, 0.5, 1.0, 2.0])
 			df.plot.scatter(x=solver, y='ppbv', ax=ax)
-			# dc.plot(x='x', y='y', ax=ax, legend=False, style='rx:')
 		plt.savefig('../plots/'+ project + '-original-' + solver)
 
 
@@ -263,11 +287,11 @@ Below are usages
 # time_query_project('../Out/KLEE')
 # time_query()
 
-# time_solved_all()
+time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
 # time_sovled(sio.cat_data('../Out/KLEE'))
 
-# plt.show()
+plt.show()
 
 
 

@@ -34,25 +34,25 @@ def write_table(line):
 	return
 
 def dir_name(path):
-	dir = ''
-	piece = path.split('/')
-	if 'KLEE' in piece:
-		dir = 'KLEE'
-	elif 'PP-CASE' in piece:
-		dir = 'PP-CASE'
-	elif 'sage' in piece:
-		dir = 'sage'
+	# dir = ''
+	# piece = path.split('/')
+	# if 'KLEE' in piece:
+	# 	dir = 'KLEE'
+	# elif 'PP-CASE' in piece:
+	# 	dir = 'PP-CASE'
+	# elif 'sage' in piece:
+	# 	dir = 'sage'
+	#
+	# name = path[path.index(dir)+len(dir):].replace('/', '-')
+	return os.path.basename(path)
 
-	name = path[path.index(dir):].replace('/', '-')
-	return name
-
-
+now = '2017-08-03-'
 def results_file(path):
-	return abs + sio.file_prefix_abs(path) + sio.now + 'all-result.csv'
+	return abs + sio.file_prefix_abs(path) + now + 'all-result.csv'
 
 
 def times_file(path):
-	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
+	return abs + sio.file_prefix_abs(path) + now + 'all-time.csv'
 
 
 def solver_table(path):
@@ -68,7 +68,7 @@ def solver_table(path):
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df <= 30.0].sum().to_string(index=False, float_format='${:,.2f}'.format)
+		line += df[df <= 30.0].sum().to_string(index=False, float_format='{:,.2f}'.format)
 		line += ' && '
 	write_table(line + '\\\\\n')
 
@@ -80,6 +80,7 @@ def dir_table(path):
 def all_table():
 	for dir in dirs:
 		dir_table('/home/zhangysh1995/PPBV/'+ dir)
+		write_table('\\hline\n')
 
 
 # dir_name('/home/zhangysh1995/ctags/KLEE/test')
