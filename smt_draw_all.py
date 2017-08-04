@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt
 import matplotlib.style
-# matplotlib.style.use('seaborn-paper')
+matplotlib.style.use('seaborn-paper')
 from matplotlib import gridspec
 import matplotlib.ticker as mtick
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 import smt_io as sio
 import pandas as pd
 import numpy as np
@@ -102,7 +104,7 @@ def draw_time(data, dir = ''):
 # draw separately
 def comp_time(path):
 	project = path.split('/').pop()
-	csv = glob.glob(path + '/*.csv')
+	csv = glob.glob(path + '/*-time.csv')
 	fig, ax = plt.subplots()
 
 	for c in csv:
@@ -112,18 +114,36 @@ def comp_time(path):
 			df = pd.DataFrame(pd.read_csv(c))
 			index = csv.index(c)
 			print(index, solver, c)
+
+			# draw original plot
 			ax.set_xlim([0, 30])
 			ax.set_ylim([0, 30])
 			ax.set_xticks([0, 1, 5, 15, 30])
 			df.plot(kind='scatter', x=solver, y='ppbv',  ax=ax, legend=False,
-					color='k', marker='x')
-			draw_refe(ax)
+					color='b', marker='x')
+
+			# reference lines
+			# draw_refe(ax)
+
+			# draw zoom-in plot
+			axins = zoomed_inset_axes(ax, 9, loc=1)
+			axins.set_xlim(0, 1)
+			axins.set_ylim(0, 1)
+			plt.xticks(visible=False)
+			plt.yticks(visible=False)
+			axins.xaxis.set_visible(False)
+			axins.yaxis.set_visible(False)
+			mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec='gray')
+
+			df.plot.scatter(x=solver, y='ppbv', ax=axins, subplots=True, legend=False,
+					color='b', marker='x')
+
 			plt.savefig('../plots/'+ project + '/' + solver + '-' + os.path.split(c)[1] + '.png')
 
 
 def comp_time_project(path):
 	project = path.split('/').pop()
-	csv = glob.glob(path + '/*.csv')
+	csv = glob.glob(path + '/*-time.csv')
 	fig, axis = plt.subplots(ncols=3)
 
 	for c in csv:
@@ -142,7 +162,7 @@ def comp_time_project(path):
 # draw scatter for solvers vs. ppbv & save
 def comp_time_matrix(path):
 	project = path.split('/').pop()
-	csv = glob.glob(path + '/*.csv')
+	csv = glob.glob(path + '/*-time.csv')
 	rows = math.ceil(math.sqrt(len(csv)))
 	fig, axis = plt.subplots(nrows=int(rows), ncols=int(rows))
 
@@ -161,7 +181,6 @@ def comp_time_matrix(path):
 			df.plot.scatter(x=solver, y='ppbv', ax=ax)
 			# dc.plot(x='x', y='y', ax=ax, legend=False, style='rx:')
 		plt.savefig('../plots/'+ project + '-original-' + solver)
-		plt.close()
 
 
 def time_query_project(path):
@@ -244,7 +263,7 @@ Below are usages
 # time_query_project('../Out/KLEE')
 # time_query()
 
-time_solved_all()
+# time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
 # time_sovled(sio.cat_data('../Out/KLEE'))
 
