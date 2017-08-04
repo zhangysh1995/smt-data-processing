@@ -1,3 +1,4 @@
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import matplotlib.style
 matplotlib.style.use('seaborn-paper')
@@ -109,7 +110,7 @@ def hist_t_query(df, ax):
 										   ax=ax, rot=rot, color=color, width=width, position=-0.05)
 			(time[i] - time[i - 1]).plot(kind='bar', bottom=time[i - 1],
 										 ax=ax, rot=rot, color=color, width=width, position=1.05)
-
+	return ax
 
 # cumsum time
 def draw_time(data, dir = ''):
@@ -216,6 +217,7 @@ def time_query_project(path):
 	fmt = '%.0f%%'
 	yticks = mtick.FormatStrFormatter(fmt)
 
+	axis = []
 	data = {}
 	for solver in solvers:
 		for c in csv:
@@ -223,10 +225,17 @@ def time_query_project(path):
 			data.update({get_name(c): df.to_dict()[solver]})
 		df = pd.DataFrame.from_dict(data, orient='columns')
 		ax = plt.subplot(gs[solvers.index(solver)], sharex=ax0)
+		axis.append(ax)
 		ax.yaxis.set_major_formatter(yticks)
 		ax.set_ylabel(solver)
 		hist_t_query(df, ax)
 
+	green = mpatches.Patch(color='green', label='0-0.1s')
+	cyan = mpatches.Patch(color='cyan', label='0.1-1.0s')
+	blue = mpatches.Patch(color='blue', label='1.0-2.0s')
+	red = mpatches.Patch(color='red', label='2.0-15s')
+	axis[0].legend(handles=[green, cyan, blue, red], bbox_to_anchor=(0.5, 1.5),
+			   loc='upper center', ncol=4)
 '''
 wrappers for functions beyond
 '''
@@ -284,10 +293,10 @@ Below are usages
 # comp_time_all_single()
 # comp_time('../Out/KLEE')
 
-# time_query_project('../Out/KLEE')
-# time_query()
+# time_query_project('../Out/sage')
+time_query()
 
-time_solved_all()
+# time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
 # time_sovled(sio.cat_data('../Out/KLEE'))
 
