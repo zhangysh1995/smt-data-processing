@@ -68,7 +68,7 @@ def solver_table(path):
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df <= 30.0].sum().to_string(index=False)
+		line += df[df <= 30.0].sum().to_string(index=False, float_format='${:,.2f}'.format)
 		line += ' && '
 	write_table(line + '\\\\\n')
 
