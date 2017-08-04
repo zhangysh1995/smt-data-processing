@@ -136,7 +136,7 @@ def compare_solvers(flist, Solvers, cpu=0):
 		print('Testing... ' + os.path.split(fname)[1])
 		for solver in Solvers:
 			# print(solver.name + ' ', flush = False)
-			testResult = test_with_solver(solver, fname, 2)
+			testResult = test_with_solver(solver, fname, 30)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
 	output_results(Solvers, os.path.split(flist[0])[0] + '/')
