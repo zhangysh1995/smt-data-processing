@@ -114,7 +114,6 @@ def hist_t_query(df, ax):
 
 # cumsum time
 def draw_time(data, dir = ''):
-	fig, axis = plt.subplots()
 	df = pd.DataFrame(data)
 	cumsum = []
 	ticks = [i for i in np.linspace(0, 10000, 51)]
@@ -212,6 +211,7 @@ def time_query_project(path):
 	csv = sio.find_csv(path)
 	# create shared x-axis
 	gs = gridspec.GridSpec(4, 1)
+	gs.update(hspace=0)
 	ax0 = plt.subplot(gs[0])
 
 	fmt = '%.0f%%'
@@ -225,11 +225,14 @@ def time_query_project(path):
 			data.update({get_name(c): df.to_dict()[solver]})
 		df = pd.DataFrame.from_dict(data, orient='columns')
 		ax = plt.subplot(gs[solvers.index(solver)], sharex=ax0)
+
 		axis.append(ax)
 		ax.yaxis.set_major_formatter(yticks)
 		ax.set_ylabel(solver)
-		hist_t_query(df, ax)
+		ax.yaxis.get_major_ticks()[0].label1.set_visible(False)
 
+		hist_t_query(df, ax)
+		plt.ylim(0, 115)
 	green = mpatches.Patch(color='green', label='0-0.1s')
 	cyan = mpatches.Patch(color='cyan', label='0.1-1.0s')
 	blue = mpatches.Patch(color='blue', label='1.0-2.0s')
