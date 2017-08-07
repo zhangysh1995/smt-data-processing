@@ -15,16 +15,22 @@ def split_project(entrance):
 			else:
 				print('\n\n===== Tests under folder ' + path + ' =====')
 				file = [os.path.join(path, f) for f in file if f.split('.')[1] == 'smt2']
-				st.test_solver_parallel(file)
+				st.test_solver_parallel(file, cpus)
 			return
 	else:
 		print('Directory Missing ' + entrance)
 
 parser = argparse.ArgumentParser(description='Run all your smt2 cases via all solvers.')
 parser.add_argument('--case', type=str, help='absolute path to your test cases root directory')
+parser.add_argument('--cpus', type=int, help='how many cpus cores you want to use? (Better under 24)')
 args = parser.parse_args()
 
-if args.case == '':
+if args.cpus == None:
+	pass
+else:
+	cpus = args.cpus
+
+if args.case == None:
 	if pwd.getpwuid(os.geteuid()).pw_name == 'zhangysh1995':
 		split_project('/home/zhangysh1995/ctags')
 	elif pwd.getpwuid(os.geteuid()).pw_name == 'root':

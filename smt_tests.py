@@ -154,13 +154,14 @@ def test_solvers(path, Solvers):
 
 factory = SolverFactory()
 
-def test_solver_parallel(flist):
+def test_solver_parallel(flist, cpus=0):
 	print('-------------Started!------------')
 	print('Total files', len(flist))
 	print('')
 	multiprocessing.freeze_support()
 	pool = multiprocessing.Pool()
-	cpus = multiprocessing.cpu_count()
+	if cpus == 0:
+		cpus = multiprocessing.cpu_count()
 	files = split_list(flist, cpus)
 	for i in range(0, cpus):
 		pool.apply_async(compare_solvers, args=(files[i], factory.create_all(), i))

@@ -16,7 +16,7 @@ if pwd.getpwuid(os.geteuid()).pw_name == 'zhangysh1995':  # configure on my loca
 elif pwd.getpwuid(os.geteuid()).pw_name == 'root':  # configure on sbtest1 docker image
 	z3_path = '/root/Solvers/z3-4.5.0/build/z3'
 	stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2'
-	pp_path = '/root/Solvers/ppsat/build-dev/ppbv'
+	pp_path = '/root/Solvers/ppsat-array/build-dev/ppbv'
 	boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
 else:
 	print('Wrong user!')
