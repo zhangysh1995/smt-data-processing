@@ -152,9 +152,7 @@ def test_solvers(path, Solvers):
 	compare_solvers(flist, Solvers)
 
 
-factory = SolverFactory()
-
-def test_solver_parallel(flist, cpus=0):
+def test_solver_parallel(flist, factory, cpus=0, ):
 	print('-------------Started!------------')
 	print('Total files', len(flist))
 	print('')
