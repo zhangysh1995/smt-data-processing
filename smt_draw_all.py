@@ -103,13 +103,13 @@ def hist_t_query(df, ax):
 		color = colors[i]
 
 		if i == 0:
-			count[i].plot(kind='bar', ax=ax, rot=rot, color=color, width=width, position=-0.05)
-			time[i].plot(kind='bar', ax=ax, rot=rot, color=color, width=width, position=1.05)
+			count[i].plot(kind='bar', ax=ax, rot=rot, color=color, width=width, position=1.05)
+			time[i].plot(kind='bar', ax=ax, rot=rot, color=color, width=width, position=-0.05)
 		else:
 			(count[i] - count[i - 1]).plot(kind='bar', bottom=count[i - 1],
-										   ax=ax, rot=rot, color=color, width=width, position=-0.05)
+										   ax=ax, rot=rot, color=color, width=width, position=1.05)
 			(time[i] - time[i - 1]).plot(kind='bar', bottom=time[i - 1],
-										 ax=ax, rot=rot, color=color, width=width, position=1.05)
+										 ax=ax, rot=rot, color=color, width=width, position=-0.05)
 	return ax
 
 # cumsum time
@@ -230,14 +230,13 @@ def time_query_project(path):
 		ax.yaxis.set_major_formatter(yticks)
 		ax.set_ylabel(solver)
 		ax.yaxis.get_major_ticks()[0].label1.set_visible(False)
-
 		hist_t_query(df, ax)
 		plt.ylim(0, 115)
 	green = mpatches.Patch(color='green', label='0-0.1s')
-	cyan = mpatches.Patch(color='cyan', label='0.1-1.0s')
-	blue = mpatches.Patch(color='blue', label='1.0-2.0s')
-	red = mpatches.Patch(color='red', label='2.0-15s')
-	yellow = mpatches.Patch(color='yellow', label='15.0-30.0s')
+	cyan = mpatches.Patch(color='cyan', label='0.1-1s')
+	blue = mpatches.Patch(color='blue', label='1-2s')
+	red = mpatches.Patch(color='red', label='2-15s')
+	yellow = mpatches.Patch(color='yellow', label='15-30s')
 	black = mpatches.Patch(color='black', label='>30s')
 	axis[0].legend(handles=[green, cyan, blue, red, yellow, black], bbox_to_anchor=(0.5, 1.5),
 			   loc='upper center', ncol=3)
@@ -302,7 +301,7 @@ Below are usages
 # comp_time('../Out/KLEE')
 
 time_query_project('../Out/KLEE')
-time_query()
+# time_query()
 
 # time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
