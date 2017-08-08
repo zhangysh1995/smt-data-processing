@@ -17,8 +17,8 @@ dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 solvers = ['boolector','ppbv','stp','z3']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
-ticks = [0.1, 1.0, 2.0, 15, 35]
-colors = ['g', 'c', 'b', 'r', 'y']
+ticks = [0.1, 1.0, 2.0, 15.0, 30.0, math.inf]
+colors = ['g', 'c', 'b', 'r', 'y', 'k']
 markers = ['d', '^', 's', 'o', 'x']
 width=0.2
 
@@ -237,8 +237,12 @@ def time_query_project(path):
 	cyan = mpatches.Patch(color='cyan', label='0.1-1.0s')
 	blue = mpatches.Patch(color='blue', label='1.0-2.0s')
 	red = mpatches.Patch(color='red', label='2.0-15s')
-	axis[0].legend(handles=[green, cyan, blue, red], bbox_to_anchor=(0.5, 1.5),
-			   loc='upper center', ncol=4)
+	yellow = mpatches.Patch(color='yellow', label='15.0-30.0s')
+	black = mpatches.Patch(color='black', label='>30s')
+	axis[0].legend(handles=[green, cyan, blue, red, yellow, black], bbox_to_anchor=(0.5, 1.5),
+			   loc='upper center', ncol=3)
+
+
 '''
 wrappers for functions beyond
 '''
@@ -275,6 +279,7 @@ def time_solved_all():
 		plt.close()
 		print('figure')
 
+
 # draw time_query
 def time_query():
 	for dir in dirs:
@@ -296,7 +301,7 @@ Below are usages
 # comp_time_all_single()
 # comp_time('../Out/KLEE')
 
-# time_query_project('../Out/sage')
+time_query_project('../Out/KLEE')
 time_query()
 
 # time_solved_all()
