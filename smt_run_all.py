@@ -35,14 +35,14 @@ def configure(args):
 		if username() == 'zhangysh1995':  # configure on my local desktop
 			z3_path = '/home/zhangysh1995/work/ppdev/z3/build/z3'
 			stp_path = '/home/zhangysh1995/work/stp/stp/build/stp-2.1.2 --SMTLIB2'
-			pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
 			boolector_path = '/home/zhangysh1995/work/boolector-2.4.1/boolector/bin/boolector --smt2'
+			pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
 		else:  # configure on sbtest1 docker image
 			z3_path = '/root/Solvers/z3-4.5.0/build/z3'
 			stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2'
-			pp_path = '/root/Solvers/ppsat-array/build-dev/ppbv'
 			boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
-		solver_path = [z3_path, stp_path, pp_path, boolector_path]
+			pp_path = '/root/Solvers/ppsat/build-dev/ppbv'
+		solver_path = [z3_path, stp_path, boolector_path, pp_path]
 		factory = SolverFactory(solver_path)
 		cases = input('Path to your cases: ')
 		cpus = input('CPU cores: ')
