@@ -58,19 +58,19 @@ else:
 	solver_path = [z3_path, stp_path, pp_path, boolector_path]
 	print(solver_path)
 
-# if args.cpus is None:
-# 	pass
-# else:
-# 	cpus = args.cpus
-#
-# factory = SolverFactory(solver_path)
-#
-# if args.case is None:
-# 	if username() == 'zhangysh1995':
-# 		split_project('/home/zhangysh1995/ctags', factory, cpus)
-# 	else:
-# 		split_project('/root/PPBV', factory, cpus)
-# else:
-# 		split_project(args.case, factory, cpus)
+if args.cpus is None:
+	pass
+else:
+	cpus = args.cpus
+
+factory = SolverFactory(solver_path)
+
+if args.case is None:
+	if username() == 'zhangysh1995':
+		split_project('/home/zhangysh1995/ctags', factory, cpus)
+	else:
+		split_project('/root/PPBV', factory, cpus)
+else:
+		split_project(args.case, factory, cpus)
 
 # scp_csv()
