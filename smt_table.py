@@ -46,13 +46,13 @@ def dir_name(path):
 	# name = path[path.index(dir)+len(dir):].replace('/', '-')
 	return os.path.basename(path)
 
-now = '2017-08-03-'
+
 def results_file(path):
-	return abs + sio.file_prefix_abs(path) + now + 'all-result.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-result.csv'
 
 
 def times_file(path):
-	return abs + sio.file_prefix_abs(path) + now + 'all-time.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
 
 
 def solver_table(path):

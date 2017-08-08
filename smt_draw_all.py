@@ -300,12 +300,12 @@ Below are usages
 # comp_time_all_single()
 # comp_time('../Out/KLEE')
 
-time_query_project('../Out/KLEE')
+# time_query_project('../Out/PP-CASE')
 # time_query()
 
 # time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
-# time_sovled(sio.cat_data('../Out/KLEE'))
+time_sovled(sio.cat_data('../Out/PP-CASE'))
 
 plt.show()
 
