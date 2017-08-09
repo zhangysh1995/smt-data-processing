@@ -48,10 +48,22 @@ def find_csv_depth(path):
 
 
 # cat data for one set together
-def cat_data(path):
+def cat_data(path, solver=None):
 	csv = find_csv(path)
-	data = pd.concat((pd.read_csv(f) for f in csv), ignore_index=True)
-	return data
+	if solver is None:
+		data = pd.concat((pd.read_csv(f) for f in csv), ignore_index=True)
+		return data
+	else:
+		data = pd.concat((pd.read_csv(f, usecols=[solver]) for f in csv), ignore_index=True)
+		return data
+
+
+def cat_data_dict(csv, solver):
+	data = {}
+	for c in csv:
+		df = pd.DataFrame(pd.read_csv(c), columns=[solver])
+		data.update({get_name(c): df.to_dict()[solver]})
+	return pd.DataFrame.from_dict(data, orient='columns')
 
 
 def split_list(alist, wanted_parts=1):
@@ -95,6 +107,12 @@ def file(solver):
 
 def file_withCPU(solver, cpu):
 	return now + solver + str(cpu) + '.csv'
+
+
+# get project from filename
+def get_name(path):
+	file = os.path.split(path)[1]
+	return file[:file.find('-2017')]
 
 
 # combine files of the same sovler
