@@ -257,6 +257,7 @@ def count_layered(dir, axis):
 	axis.legend(handles=[layer1, layer2], loc='upper right', bbox_to_anchor=(1.0, 1.0))
 
 
+# TODO: ajdust width, gap and labels
 # count queries processed in pre-processing
 def count_pre(case, axis):
 	fmt = '%.0f%%'
@@ -271,10 +272,9 @@ def count_pre(case, axis):
 			all = len(glob.glob(project + '/*.smt2'))
 			# need after-processing
 			second = len(glob.glob(project + '/*.cnf'))
-			print(all)
-			print(second)
 			x = X[dirs.index(dir)]
-			plt.bar(left=x, height=all - second, width=0.2, color='skyblue')
+
+			plt.bar(left=x, height=all - second, xlabel=dir,  width=0.2, color='skyblue')
 			plt.bar(left=x, height=second, width=0.2, bottom=all - second, color='gold')
 
 '''
@@ -333,6 +333,8 @@ def count_layered_all():
 		count_layered(dir, axis)
 		i += 1
 
+
+# draw pre-processes query
 def count_pre_all():
 	gs = gridspec.GridSpec(3, 1)
 	gs.update(hspace=0)
@@ -360,7 +362,7 @@ Below are usages
 
 # time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
-time_sovled(sio.cat_data('../Out/PP-CASE'))
+# time_sovled(sio.cat_data('../Out/PP-CASE'))
 
 # fig, axis = plt.subplots()
 # count_layered('resultsample', axis)
