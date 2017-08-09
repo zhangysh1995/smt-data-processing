@@ -1,6 +1,9 @@
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import matplotlib.style
+
+from smt_io import cat_data_dict
+
 matplotlib.style.use('seaborn-paper')
 from matplotlib import gridspec
 import matplotlib.ticker as mtick
@@ -14,6 +17,7 @@ import glob
 import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
+cases = ['../PPBV/sage', '../PPBV/KLEE', '../PPBV/PP-CASE']
 solvers = ['boolector','ppbv','stp','z3']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
@@ -26,12 +30,6 @@ x = np.arange(0, 30, 5)
 equal = pd.DataFrame({'x': x, 'y': x})
 double = pd.DataFrame({'x': x, 'y': x * 2})
 half = pd.DataFrame({'x': x, 'y': x * 1/2})
-
-
-# get project from filename
-def get_name(path):
-	file = os.path.split(path)[1]
-	return file[:file.find('-2017')]
 
 
 # draw reference liens
@@ -218,12 +216,8 @@ def time_query_project(path):
 	yticks = mtick.FormatStrFormatter(fmt)
 
 	axis = []
-	data = {}
 	for solver in solvers:
-		for c in csv:
-			df = pd.DataFrame(pd.read_csv(c), columns=[solver])
-			data.update({get_name(c): df.to_dict()[solver]})
-		df = pd.DataFrame.from_dict(data, orient='columns')
+		df = cat_data_dict(csv, solver)
 		ax = plt.subplot(gs[solvers.index(solver)], sharex=ax0)
 
 		axis.append(ax)
@@ -241,6 +235,47 @@ def time_query_project(path):
 	axis[0].legend(handles=[green, cyan, blue, red, yellow, black], bbox_to_anchor=(0.5, 1.5),
 			   loc='upper center', ncol=3)
 
+
+# count queries processed within layers
+def count_layered(dir, axis):
+	csv = glob.glob(os.path.join(dir, '*.csv'))
+	df = sio.cat_data_dict(csv, 'ppbv')
+
+	fmt = '%.0f%%'
+	yticks = mtick.FormatStrFormatter(fmt)
+	axis.yaxis.set_major_formatter(yticks)
+
+	all = df.count()
+	og = df[df < 0.01].count()
+	# layer1
+	pd.DataFrame(og / all * 100).plot(kind='bar', ax=axis, color='skyblue', rot=-45)
+	# layer2
+	pd.DataFrame((all -og) / all * 100).plot.bar(bottom=og/all*100, ax=axis, color='gold', rot=-45)
+
+	layer1 = mpatches.Patch(color='skyblue', label='layer 1')
+	layer2 = mpatches.Patch(color='gold', label='layer 2')
+	axis.legend(handles=[layer1, layer2], loc='upper right', bbox_to_anchor=(1.0, 1.0))
+
+
+# count queries processed in pre-processing
+def count_pre(case, axis):
+	fmt = '%.0f%%'
+	yticks = mtick.FormatStrFormatter(fmt)
+	axis.yaxis.set_major_formatter(yticks)
+
+	for path, dirs, files in os.walk(case):
+		X = np.linspace(1, len(dirs) / 2, len(dirs))
+		X = [int(x) for x in X]
+		for dir in dirs:
+			project = os.path.join(path, dir)
+			all = len(glob.glob(project + '/*.smt2'))
+			# need after-processing
+			second = len(glob.glob(project + '/*.cnf'))
+			print(all)
+			print(second)
+			x = X[dirs.index(dir)]
+			plt.bar(left=x, height=all - second, width=0.2, color='skyblue')
+			plt.bar(left=x, height=second, width=0.2, bottom=all - second, color='gold')
 
 '''
 wrappers for functions beyond
@@ -285,8 +320,28 @@ def time_query():
 		folder = dir.split('/').pop()
 		time_query_project(dir)
 		plt.savefig('../plots/' + folder + '-time-query')
-# draw time&query vs. solved
-# def time_query_all():
+
+
+# draw query-processed layers
+def count_layered_all():
+	gs = gridspec.GridSpec(3,1)
+	gs.update(hspace=0)
+
+	i = 0
+	for dir in dirs:
+		axis = plt.subplot(gs[i])
+		count_layered(dir, axis)
+		i += 1
+
+def count_pre_all():
+	gs = gridspec.GridSpec(3, 1)
+	gs.update(hspace=0)
+
+	i = 0
+	for case in cases:
+		axis = plt.subplot(gs[i])
+		count_pre(case, axis)
+		i += 1
 
 
 '''
@@ -306,6 +361,14 @@ Below are usages
 # time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
 time_sovled(sio.cat_data('../Out/PP-CASE'))
+
+# fig, axis = plt.subplots()
+# count_layered('resultsample', axis)
+# count_layered_all()
+
+# fig, axis = plt.subplots()
+# count_pre('/home/zhangysh1995/ctags', axis)
+# count_pre_all()
 
 plt.show()
 

@@ -62,6 +62,7 @@ def configure(args):
 		stp_path = config.get('stp', 'path')
 		pp_path = config.get('ppbv', 'path')
 		boolector_path = config.get('boolector', 'path')
+		# ppf_path = config.get('ppbvf', 'path')
 		solver_path = [z3_path, stp_path, pp_path, boolector_path]
 
 		factory = SolverFactory(solver_path)
