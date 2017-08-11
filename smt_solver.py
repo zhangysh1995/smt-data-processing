@@ -35,12 +35,12 @@ class SolverFactory:
 		return Solver('ppbvf', self.ppf_path)
 
 	def create_all(self):
-		solvers = [self.create_z3(), self.create_stp(),
-					self.create_boolector(), self.create_ppbv()]
 		if self.solver_No == 4:
-			return solvers
+			return [self.create_z3(), self.create_stp(),
+					self.create_boolector(), self.create_ppbv()]
 		else:
-			return solvers.append(self.create_ppbvF())
+			return [self.create_z3(), self.create_stp(),
+					self.create_boolector(), self.create_ppbv(), self.create_ppbvF()]
 
 
 # To construct solvers

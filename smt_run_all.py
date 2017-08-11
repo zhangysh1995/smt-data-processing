@@ -19,7 +19,7 @@ def split_project(entrance, factory, cpus):
 					split_project(dir.pop(), factory, cpus)
 			else:
 				print('\n\n===== Tests under folder ' + path + ' =====')
-				file = [os.path.join(path, f) for f in file if f.split('.')[1] == 'smt2']
+				file = [os.path.join(path, f) for f in file if f.split('.').pop() == 'smt2']
 				st.test_solver_parallel(file, factory, cpus)
 			return
 	else:

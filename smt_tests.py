@@ -130,15 +130,16 @@ def test_with_solver(solver, testfile, timeout):
 	return TestResult(runtime, result, verify, error)
 
 
-def compare_solvers(flist, Solvers, cpu=0):
+def compare_solvers(flist, Solvers):
 	# run cases with all solvers
 	for fname in flist:
-		print('Testing... ' + os.path.split(fname)[1])
+		print('Testing...' + os.path.split(fname)[1], end=' ')
 		for solver in Solvers:
-			# print(solver.name + ' ', flush = False)
+			print(solver.name, end=' ')
 			testResult = test_with_solver(solver, fname, 30)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
+		print('\n')
 	output_results(Solvers, os.path.split(flist[0])[0] + '/')
 	# output_results_separate(Solvers, cpu)
 	print('Finished!')
@@ -152,7 +153,7 @@ def test_solvers(path, Solvers):
 	compare_solvers(flist, Solvers)
 
 
-def test_solver_parallel(flist, factory, cpus=0, ):
+def test_solver_parallel(flist, factory, cpus=0):
 	print('-------------Started!------------')
 	print('Total files', len(flist))
 	print('')
@@ -162,11 +163,11 @@ def test_solver_parallel(flist, factory, cpus=0, ):
 		cpus = multiprocessing.cpu_count()
 	files = split_list(flist, cpus)
 	for i in range(0, cpus):
-		pool.apply_async(compare_solvers, args=(files[i], factory.create_all(), i))
+		pool.apply_async(compare_solvers, args=(files[i], factory.create_all()))
 	pool.close()
 	pool.join()
 	print('All Finished!')
-	output_cases(flist)
+	# output_cases(flist)
 	# combine_data(cpus)
 
 # cases = '/root/PP_CASE/curl'

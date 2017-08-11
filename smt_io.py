@@ -6,7 +6,7 @@ import time
 
 import pandas as pd
 
-solver_list = ['z3', 'stp', 'boolector', 'ppbv']
+solver_list = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
 
 # find cnf files in path
 def find_cnf(path):
