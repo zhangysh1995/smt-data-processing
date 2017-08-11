@@ -3,7 +3,7 @@ import numpy as np
 import smt_io as sio
 import os
 
-solvers = ['z3', 'stp', 'boolector', 'ppbv']
+solvers = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
 dirs = ['sage', 'KLEE', 'PP-CASE']
 
 # conut queries
