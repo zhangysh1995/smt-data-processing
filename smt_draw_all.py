@@ -18,7 +18,7 @@ import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 cases = ['../PPBV/sage', '../PPBV/KLEE', '../PPBV/PP-CASE']
-solvers = ['boolector', 'ppbv', 'ppbvf', 'stp','z3']
+solvers = ['boolector', 'ppbv', 'ppbvf', 'stp', 'z3']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
 ticks = [0.1, 1.0, 2.0, 15.0, 30.0, math.inf]
@@ -208,7 +208,7 @@ def comp_time_matrix(path):
 def time_query_project(path):
 	csv = sio.find_csv(path)
 	# create shared x-axis
-	gs = gridspec.GridSpec(4, 1)
+	gs = gridspec.GridSpec(5, 1)
 	gs.update(hspace=0)
 	ax0 = plt.subplot(gs[0])
 
@@ -357,12 +357,12 @@ Below are usages
 # comp_time_all_single()
 # comp_time('../Out/KLEE')
 
-# time_query_project('../Out/PP-CASE')
+time_query_project('../Out/KLEE')
 # time_query()
 
 # time_solved_all()
 # time_sovled(pd.read_csv('resultsample/dircolors.csv'))
-# time_sovled(sio.cat_data('../Out/PP-CASE'))
+# time_sovled(sio.cat_data('../Out/KLEE'))
 
 # fig, axis = plt.subplots()
 # count_layered('resultsample', axis)

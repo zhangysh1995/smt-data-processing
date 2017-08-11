@@ -3,7 +3,7 @@ import numpy as np
 import smt_io as sio
 import os
 
-solvers = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
+solvers = ['boolector', 'z3', 'stp', 'ppbv', 'ppbvf']
 dirs = ['sage', 'KLEE', 'PP-CASE']
 
 # conut queries
@@ -63,12 +63,12 @@ def solver_table(path, query_no):
 		# print solved instance
 		data = pd.read_csv(results)
 		df = pd.DataFrame(data, columns=[solver])
-		unsolved = query_no - df[df[solver].str.contains('sat')].count().to_numberic(index=False)
+		unsolved = query_no - int(df[df[solver].str.contains('sat')].count().to_string(index=False))
 		line += str(unsolved) + ' & '
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df <= 30.0].sum().to_string(index=False, float_format='{:,.f}'.format)
+		line += df[df <= 30.0].sum().to_string(index=False, float_format='{:,.0f}'.format)
 		line += ' && '
 	write_table(line + '\\\\\n')
 
@@ -78,9 +78,10 @@ def dir_table(path):
 
 
 def all_table():
-	for dir in dirs:
-		dir_table('/home/zhangysh1995/PPBV/'+ dir)
-		write_table('\\hline\n')
+	# for dir in dirs:
+	# 	dir_table('/home/zhangysh1995/PPBV/'+ dir)
+	dir_table('/home/zhangysh1995/PPBV/KLEE')
+		# write_table('\\hline\n')
 
 
 # dir_name('/home/zhangysh1995/ctags/KLEE/test')
