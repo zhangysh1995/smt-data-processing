@@ -58,15 +58,26 @@ def configure(args):
 		read = input('Continue?(y/n) ')
 		if read == 'n':
 			exit(0)
-
 		config.read(config_file)
+
+		choice = input('Run which solvers? a.3+1, b.3+2, c.2')
+
+		# initialize from configuration
 		z3_path = config.get('z3', 'path')
 		stp_path = config.get('stp', 'path')
 		pp_path = config.get('ppbv', 'path')
 		boolector_path = config.get('boolector', 'path')
 		ppf_path = config.get('ppbvf', 'path')
-		solver_path = [z3_path, stp_path, pp_path, boolector_path, ppf_path]
 
+		# customize solvers
+		if choice == 'c':
+			solver_path = [pp_path, ppf_path]
+		elif choice == 'b':
+			solver_path = [z3_path, stp_path, boolector_path, pp_path, ppf_path]
+		else:
+			solver_path = [z3_path, stp_path, boolector_path, pp_path]
+
+		# run the program
 		factory = SolverFactory(solver_path)
 		split_project(config.get('general', 'cases'), factory, cpus=int(config.get('general', 'cpus')))
 

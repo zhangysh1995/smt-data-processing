@@ -18,7 +18,7 @@ import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 cases = ['../PPBV/sage', '../PPBV/KLEE', '../PPBV/PP-CASE']
-solvers = ['boolector','ppbvf','stp','z3']
+solvers = ['boolector', 'ppbv', 'ppbvf', 'stp','z3']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
 ticks = [0.1, 1.0, 2.0, 15.0, 30.0, math.inf]
