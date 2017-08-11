@@ -18,7 +18,7 @@ def count_queries(path):
 				file =[f for f in file if f.split('.')[1] == 'smt2']
 				# write_table(dir_name(path) + ',' + str(len(file)) + '\n')
 				write_table(dir_name(path) + ' & ' + str(len(file)) + ' & ')
-				solver_table(path + '/')
+				solver_table(path + '/', len(file))
 			return
 	else:
 		print('Directory Missing ' + path)
@@ -55,7 +55,7 @@ def times_file(path):
 	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
 
 
-def solver_table(path):
+def solver_table(path, query_no):
 	results = results_file(path)
 	times = times_file(path)
 	line = ''
@@ -63,8 +63,8 @@ def solver_table(path):
 		# print solved instance
 		data = pd.read_csv(results)
 		df = pd.DataFrame(data, columns=[solver])
-		line += df[df[solver].str.contains('sat')].count().to_string(index=False)
-		line += ' & '
+		unsolved = query_no - df[df[solver].str.contains('sat')].count().to_numberic(index=False)
+		line += str(unsolved) + ' & '
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
