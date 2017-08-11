@@ -16,8 +16,8 @@ class SolverFactory:
 			self.stp_path = solver_path[1]
 			self.boolector_path = solver_path[2]
 			self.pp_path = solver_path[3]
-			# if len(solver_path) > 4:
-			# 	self.ppf_path = solver_path[4]
+			if len(solver_path) > 4:
+				self.ppf_path = solver_path[4]
 
 	def create_z3(self):
 		return Solver('z3', self.z3_path)
@@ -31,15 +31,17 @@ class SolverFactory:
 	def create_ppbv(self):
 		return Solver('ppbv', self.pp_path)
 
-	# def create_ppbvF(self):
-	# 	return Solver('ppbvf', self.ppf_path)
+	def create_ppbvF(self):
+		return Solver('ppbvf', self.ppf_path)
 
 	def create_all(self):
-		if self.solver_No == 4:
-			return [self.create_z3(), self.create_stp(),
+		solvers = [self.create_z3(), self.create_stp(),
 					self.create_boolector(), self.create_ppbv()]
-		# else:
-			# do other things
+		if self.solver_No == 4:
+			return solvers
+		else:
+			return solvers.append(self.create_ppbvF())
+
 
 # To construct solvers
 class Solver:

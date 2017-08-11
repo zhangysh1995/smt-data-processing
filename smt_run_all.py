@@ -62,8 +62,8 @@ def configure(args):
 		stp_path = config.get('stp', 'path')
 		pp_path = config.get('ppbv', 'path')
 		boolector_path = config.get('boolector', 'path')
-		# ppf_path = config.get('ppbvf', 'path')
-		solver_path = [z3_path, stp_path, pp_path, boolector_path]
+		ppf_path = config.get('ppbvf', 'path')
+		solver_path = [z3_path, stp_path, pp_path, boolector_path, ppf_path]
 
 		factory = SolverFactory(solver_path)
 		split_project(config.get('general', 'cases'), factory, cpus=int(config.get('general', 'cpus')))
