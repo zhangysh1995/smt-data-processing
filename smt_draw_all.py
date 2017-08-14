@@ -357,7 +357,7 @@ Below are usages
 # comp_time_all_single()
 # comp_time('../Out/KLEE')
 
-time_query_project('../Out/KLEE')
+# time_query_project('../Out/sage')
 # time_query()
 
 # time_solved_all()
