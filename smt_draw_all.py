@@ -18,7 +18,7 @@ import math
 
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 cases = ['../PPBV/sage', '../PPBV/KLEE', '../PPBV/PP-CASE']
-solvers = ['boolector', 'ppbv', 'ppbvf', 'stp', 'z3']
+solvers = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
 
 xticks = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0, 2.0, 5.0, 15.0, 30.0]
 ticks = [0.1, 1.0, 2.0, 15.0, 30.0, math.inf]
@@ -47,12 +47,12 @@ def comb_time_all():
 
 #
 def time_sovled(data):
-	# rows, columns = df.shape
+	# rows, columns = data.shape
 	# X = np.linspace(0, rows, 51)
 	# X = [int(x) for x in X]
 	# cumsum = []
 	# for i in X:
-	# 	cumsum.append(df.loc[:i].sum())
+	# 	cumsum.append(data.loc[:i].sum())
 	# d = pd.DataFrame(cumsum)
 	# for solver in solvers:
 	# 	index = solvers.index(solver)
@@ -66,22 +66,23 @@ def time_sovled(data):
 		f.close()
 
 	times = []
-	datas = np.genfromtxt('all.csv', skip_header=1, delimiter=',')
-	for data in datas.T:
-		times.append(data)
+	# datas = np.genfromtxt('all.csv', skip_header=1, delimiter=',')
+	datas = pd.read_csv('all.csv')
+
+	for solver in solvers:
+		times.append(datas[solver])
+
 	rows = len(times[1])
 	Xticks =[int(x) for x in np.linspace(0, rows, 51)]
 
-	index = 0
-	for time in times:
+	for i, time in enumerate(times):
 		# print(time)
 		cumsum = []
 		for tick in Xticks:
-			cumsum.append(sum(time[1:int(tick)]))
+			cumsum.append(sum(time[0:int(tick)]))
 		plt.xlim(0, rows+500)
-		# plt.ylim(0, sum(time))
-		plt.plot(Xticks, cumsum, label=solvers[index], color=colors[index], marker=markers[index], markersize=5)
-		index += 1
+		# plt.ylim(0, sum(time)))
+		plt.plot(Xticks, cumsum, label=solvers[i], color=colors[i], marker=markers[i], markersize=5)
 
 	plt.legend()
 
@@ -109,6 +110,7 @@ def hist_t_query(df, ax):
 			(time[i] - time[i - 1]).plot(kind='bar', bottom=time[i - 1],
 										 ax=ax, rot=rot, color=color, width=width, position=-0.05)
 	return ax
+
 
 # cumsum time
 def draw_time(data, dir = ''):
@@ -239,14 +241,14 @@ def time_query_project(path):
 # count queries processed within layers
 def count_layered(dir, axis):
 	csv = glob.glob(os.path.join(dir, '*.csv'))
-	df = sio.cat_data_dict(csv, 'ppbv')
+	df = sio.cat_data_dict(csv, 'ppbvf')
 
 	fmt = '%.0f%%'
 	yticks = mtick.FormatStrFormatter(fmt)
 	axis.yaxis.set_major_formatter(yticks)
 
 	all = df.count()
-	og = df[df < 0.01].count()
+	og = df[df <= 15.0].count()
 	# layer1
 	pd.DataFrame(og / all * 100).plot(kind='bar', ax=axis, color='skyblue', rot=-45)
 	# layer2
