@@ -26,34 +26,17 @@ def split_project(entrance, factory, cpus):
 		print('Directory Missing ' + entrance)
 
 
-def configure(args):
-	config_file = args.config
-	config = configparser.ConfigParser()
-
-	if args.config is None:
-		print('====== Use -h for help if you want configuration file ======')
-		if username() == 'zhangysh1995':  # configure on my local desktop
-			z3_path = '/home/zhangysh1995/work/ppdev/z3/build/z3'
-			stp_path = '/home/zhangysh1995/work/stp/stp/build/stp-2.1.2 --SMTLIB2'
-			boolector_path = '/home/zhangysh1995/work/boolector-2.4.1/boolector/bin/boolector --smt2'
-			pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
-			ppf_path = ''
-		else:  # configure on sbtest1 docker image
-			z3_path = '/root/Solvers/z3-4.5.0/build/z3'
-			stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2'
-			boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
-			pp_path = '/root/Solvers/ppsat/build-dev/ppbv --array'
-			ppf_path = '/root/Sovlers/ppsat-layer/build-dev/ppbv --array --layer'
-		solver_path = [z3_path, stp_path, boolector_path, pp_path, ppf_path]
-		factory = SolverFactory(solver_path)
-		cases = input('Path to your cases: ')
-		cpus = input('CPU cores: ')
-		split_project(cases, factory, cpus=int(cpus))
-	else:
+def configure(config_file):
 		with open(config_file, 'r') as f:
-			for line in f:
-				print(line)
-			f.close()
+			try:
+				for line in f:
+					print(line)
+				f.close()
+			except FileNotFoundError as e:
+				print(e)
+
+		config = configparser.ConfigParser()
+		config.read(config_file)
 
 		# initialize from configuration
 		z3_path = config.get('z3', 'path')
@@ -70,12 +53,6 @@ def configure(args):
 		split_project(config.get('general', 'cases'), factory, cpus=int(config.get('general', 'cpus')))
 
 
-def run():
-	parser = argparse.ArgumentParser(description='Run all your smt2 cases via all solvers.')
-	parser.add_argument('--config', type=str, help='point to your configuration files (e.g config.)')
-	args = parser.parse_args()
-	configure(args)
+def run(config):
+	configure(config)
 
-
-run()
-# scp_csv()
