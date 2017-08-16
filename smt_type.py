@@ -3,10 +3,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
+import matplotlib.patches as mpatches
 smtbench = '/home/zhangysh1995/work/ppdev/smtbench/cmake-build-debug/smtbench '
 
-colors = ['orchid', 'dodgerblue', 'springgreen', 'yellow']
+colors = ['k', 'plum', 'dodgerblue', 'springgreen', 'yellow']
 # query type of a project
+
+
 def type_dir(project):
 	for path, dirs, files in os.walk(project):
 		for d in dirs:
@@ -83,15 +86,15 @@ def variable_hist(file):
 # draw distribution of variables for one file
 def var_percent(file):
 	var = variable_hist(file)
-	dir = var[0]
+	dirs = var[0]
 	var_list = var[1]
 
 	ax = plt.subplot()
 	# generate x position for bars
-	ticks = range(len(dir)+1)[1:]
+	ticks = range(len(dirs)+1)[1:]
 	# iterate each project
-	for d, v, x in zip(dir, var_list, ticks):
-		window = np.linspace(0, max(v), 4)
+	for d, v, x in zip(dirs, var_list, ticks):
+		window = np.linspace(0, max(v), 5)
 		count = []
 		all = len(v)
 		# count cumulative sum with window
@@ -110,13 +113,32 @@ def var_percent(file):
 	yticks = mtick.FormatStrFormatter(fmt)
 	ax.yaxis.set_major_formatter(yticks)
 	# set x ticks
-	plt.xticks(ticks, dir)
+	plt.xticks(ticks, dirs)
 	# set legend
 	plt.title('Distribution of Variable Numbers Across sage Projects')
 	plt.xlabel('project')
 	plt.ylabel('No.')
 
-# def feature_hist(file):
+
+def get_features(file):
+	out = '../Out/' + file + '.csv'
+
+	with open(out, 'r') as f:
+		dirs = []
+		dirs.append(f.readline())
+		feature = np.zeros(32)
+		features = []
+
+		for line in f:
+			data = line.split()
+			if 'smt2' in data[0]:
+				data = [int(d) for d in data[1:-1]]
+				feature = [f + d for f, d in zip(feature, data)]
+			else:
+				dirs.append(data[0])
+				features.append(feature)
+				feature = np.zeros(32)
+	return dirs, features
 
 
 '''
@@ -133,9 +155,20 @@ def draw_variable_hist(file):
 		pd.DataFrame(v).plot(kind='hist', title=dir[i])
 
 
-# type_dir('/home/zhangysh1995/PPBV/PP-CASE')
+def feature_percent(file):
+	dir, features = get_features(file)
+	pd.DataFrame(features[0]).plot(kind='pie', subplots=True)
+
+
+'''
+Below are usages
+'''
+
+# type_dir('/home/zhangysh1995/PPBV/KLEE')
 # draw_type ('/home/zhangysh1995/PPBV/KLEE')
 # plt.bar(range(0, 32), count('sage'))
 # variable_hist('sage')
 # var_percent('sage')
+# get_features('sage')
+feature_percent('sage')
 plt.show()
