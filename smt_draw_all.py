@@ -70,7 +70,9 @@ def time_sovled(data):
 	datas = pd.read_csv('all.csv')
 
 	for solver in solvers:
-		times.append(datas[solver])
+		time = data[solver]
+		time = [t for t in time if t <= 30.0]
+		times.append(time)
 
 	rows = len(times[1])
 	Xticks =[int(x) for x in np.linspace(0, rows, 51)]
@@ -79,7 +81,7 @@ def time_sovled(data):
 		# print(time)
 		cumsum = []
 		for tick in Xticks:
-			cumsum.append(sum(time[0:int(tick)]))
+			cumsum.append(sum(time[:int(tick)]))
 		plt.xlim(0, rows+500)
 		# plt.ylim(0, sum(time)))
 		plt.plot(Xticks, cumsum, label=solvers[i], color=colors[i], marker=markers[i], markersize=5)
@@ -97,8 +99,17 @@ def hist_t_query(df, ax):
 	sum = df.sum(axis=0)
 	rot = 45
 	for i in range(len(ticks)):
-		count.append((df[df < ticks[i]].count()) / all * 100)
-		time.append((df[df < ticks[i]].sum()) / sum * 100)
+		# query time
+		nc = df[df < ticks[i]].count()
+		nc = nc.fillna(0)
+		count.append(nc / all * 100)
+
+		# cumulitive time of the query solving time
+		nt = df[df < ticks[i]].sum()
+		nt = nt.fillna(value=0.0)
+		time.append(nt / sum * 100)
+
+		print(time)
 		color = colors[i]
 
 		if i == 0:
