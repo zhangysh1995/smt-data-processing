@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import matplotlib.patches as mpatches
+
 smtbench = '/home/zhangysh1995/work/ppdev/smtbench/cmake-build-debug/smtbench '
 
 colors = ['k', 'plum', 'dodgerblue', 'springgreen', 'yellow']
@@ -89,7 +90,8 @@ def var_percent(file):
 	dirs = var[0]
 	var_list = var[1]
 
-	ax = plt.subplot()
+	set_style()
+
 	# generate x position for bars
 	ticks = range(len(dirs)+1)[1:]
 	# iterate each project
@@ -108,16 +110,22 @@ def var_percent(file):
 				plt.bar(x, c/all*100, color=colors[i])
 			else:
 				plt.bar(x, c-count[i-1], bottom=count[i-1], color=colors[i])
-	# format y tick to percentage
-	fmt = '%.0f%%'
-	yticks = mtick.FormatStrFormatter(fmt)
-	ax.yaxis.set_major_formatter(yticks)
+
+
 	# set x ticks
 	plt.xticks(ticks, dirs)
 	# set legend
 	plt.title('Distribution of Variable Numbers Across sage Projects')
 	plt.xlabel('project')
 	plt.ylabel('No.')
+
+
+def set_style():
+	ax = plt.subplot()
+	# format y tick to percentage
+	fmt = '%.0f%%'
+	yticks = mtick.FormatStrFormatter(fmt)
+	ax.yaxis.set_major_formatter(yticks)
 
 
 def get_features(file):
@@ -138,6 +146,7 @@ def get_features(file):
 				dirs.append(data[0])
 				features.append(feature)
 				feature = np.zeros(32)
+		features.append(feature)
 	return dirs, features
 
 
@@ -155,9 +164,123 @@ def draw_variable_hist(file):
 		pd.DataFrame(v).plot(kind='hist', title=dir[i])
 
 
-def feature_percent(file):
-	dir, features = get_features(file)
-	pd.DataFrame(features[0]).plot(kind='pie', subplots=True)
+def linearity(file):
+	basic = [4, 6, 7, 12, 14]
+	linear = [18, 20]
+	nlinear = [5, 17, 21, 27, 28, 29, 30, 31]
+	dirs, features = get_features(file)
+	data = {}
+	for d, f in zip(dirs, features):
+		data.update({d: f})
+
+	ticks = range(len(dirs)+1)[1:]
+	set_style()
+	for t, d, feature in zip(ticks, dirs, features):
+		all = sum([feature[i] for i in basic + linear + nlinear])
+		i = 0
+		bn = [i + feature[b] for b in basic]
+		i = 0
+		plt.bar(t, sum(bn)/all*100, color='dodgerblue')
+		ln = [i + feature[l] for l in linear]
+		plt.bar(t, sum(ln)/all*100, bottom=sum(bn)/all*100, color='springgreen')
+		i = 0
+		nln = [i + feature[n] for n in nlinear]
+		plt.bar(t, sum(nln)/all*100, bottom=(sum(bn)+sum(ln))/all*100, color='yellow')
+	# set legend
+	axis = plt.subplot()
+	blue = mpatches.Patch(color='dodgerblue', label='Basic')
+	green = mpatches.Patch(color='springgreen', label='Linear')
+	yellow = mpatches.Patch(color='yellow', label='Non-linear')
+	axis.legend(handles=[blue, green, yellow])
+	# set x ticks
+	plt.xticks(ticks, dirs)
+	plt.savefig('linearity.png')
+
+
+def equality(file):
+	inequal = [8, 15, 19, 22, 23, 24, 25, 26]
+	equal = [1]
+	dirs, features = get_features(file)
+	data = {}
+	for d, f in zip(dirs, features):
+		data.update({d: f})
+
+	ticks = range(len(dirs)+1)[1:]
+	set_style()
+	for t, d, feature in zip(ticks, dirs, features):
+		all = sum([feature[i] for i in inequal + equal])
+		iq = [i + feature[i] for i in inequal]
+		plt.bar(t, sum(iq)/all*100, color='dodgerblue')
+		plt.bar(t, feature[1]/all*100, bottom=sum(iq)/all*100, color='springgreen')
+	# set legend
+	axis = plt.subplot()
+	blue = mpatches.Patch(color='dodgerblue', label='Inequality')
+	green = mpatches.Patch(color='springgreen', label='Equality')
+	axis.legend(handles=[blue, green])
+	# set x ticks
+	plt.xticks(ticks, dirs)
+	plt.savefig('equality.png')
+
+
+def linear_set(file):
+	# basic_list = [4, 6, 7, 12, 14]
+	linear_list = [18, 20]
+	nlinear_list = [5, 17, 21, 27, 28, 29, 30, 31]
+	out = '../Out/' + file + '.csv'
+
+	with open(out, 'r') as f:
+		dirs = []
+		dirs.append(f.readline())
+		type = np.zeros(3)
+		types = []
+
+		for line in f:
+			data = line.split()
+			if 'smt2' in data[0]:
+				data = [int(d) for d in data[1:-1]]
+				nzero = [i for i, f in enumerate(data) if f > 0]
+				if len(set.intersection(set(nzero), nlinear_list)) > 0:
+					type[0] += 1
+				elif len(set.intersection(set(nzero), linear_list)) > 0:
+					type[1] += 1
+				else:
+					type[2] += 1
+			else:
+				dirs.append(data[0])
+				types.append(type)
+				type = np.zeros(3)
+		types.append(type)
+	return dirs, types
+
+
+def linear_ratio(file):
+	# basic_list = [4, 6, 7, 12, 14]
+	linear_list = [18, 20]
+	nlinear_list = [5, 17, 21, 27, 28, 29, 30, 31]
+	out = '../Out/' + file + '.csv'
+
+	with open(out, 'r') as f:
+		dirs = []
+		dirs.append(f.readline())
+		type = np.zeros(2)
+		types = []
+
+		for line in f:
+			data = line.split()
+			if 'smt2' in data[0]:
+				data = [int(d) for d in data[1:-1]]
+				linear = sum([data[i] for i in linear_list])
+				nlinear = sum([data[i] for i in nlinear_list])
+				if linear > nlinear:
+					type[0] += 1
+				else:
+					type[1] += 1
+			else:
+				dirs.append(data[0])
+				types.append(type)
+				type = np.zeros(2)
+		types.append(type)
+	return dirs, types
 
 
 '''
@@ -170,5 +293,9 @@ Below are usages
 # variable_hist('sage')
 # var_percent('sage')
 # get_features('sage')
-feature_percent('sage')
+# linearity('sage')
+# equality('sage')
+# dirs, types = linear_set('sage')
+# dirs, types = linear_ratio('ppcase')
+
 plt.show()
