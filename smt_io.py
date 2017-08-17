@@ -157,10 +157,10 @@ def output_results_separate(Solvers, cpu):
 				print('File I/O error: '.format(e))
 
 # Save results to a huge file
-def output_results(Solvers, path):
+def output_results(Solvers, path, flist=None):
 	newfile1 = file_prefix_rela(path) + now + 'all-time.csv'
 	newfile2 = file_prefix_rela(path) + now + 'all-result.csv'
-
+	flist = [os.path.basename(f) for f in flist]
 	# TODO: multicore variable competition here for `header`
 	if(os.path.isfile(newfile1)):
 		header = False
@@ -169,6 +169,7 @@ def output_results(Solvers, path):
 
 	# save time
 	data = {}
+	data.update({'case': flist})
 	for solver in Solvers:
 		data.update({solver.name: solver.times})
 	df = pd.DataFrame(data)
@@ -180,7 +181,8 @@ def output_results(Solvers, path):
 			print('I/O error when saving results: ')
 	data.clear()
 
-	#save results
+	# save results
+	data.update({'case': flist})
 	for solver in Solvers:
 		data.update({solver.name: solver.results})
 	df = pd.DataFrame(data)

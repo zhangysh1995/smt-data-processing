@@ -140,7 +140,7 @@ def compare_solvers(flist, Solvers):
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
 		print('\n')
-	output_results(Solvers, os.path.split(flist[0])[0] + '/')
+	output_results(Solvers, os.path.split(flist[0])[0] + '/', flist)
 	# output_results_separate(Solvers, cpu)
 	print('Finished!')
 
@@ -161,7 +161,7 @@ def test_solver_parallel(flist, factory, cpus=0):
 	pool = multiprocessing.Pool()
 	if cpus == 0:
 		cpus = multiprocessing.cpu_count()
-	files = split_list(flist, cpus)
+	files = split_list(flist[:8], cpus)
 	for i in range(0, cpus):
 		pool.apply_async(compare_solvers, args=(files[i], factory.create_all()))
 	pool.close()
