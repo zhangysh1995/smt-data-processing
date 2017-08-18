@@ -6,7 +6,7 @@ import time
 
 import pandas as pd
 
-solver_list = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
+solver_list = ['s1', 's2', 's3']
 
 # find cnf files in path
 def find_cnf(path):
@@ -158,8 +158,8 @@ def output_results_separate(Solvers, cpu):
 
 # Save results to a huge file
 def output_results(Solvers, path, flist=None):
-	newfile1 = file_prefix_rela(path) + now + 'all-time.csv'
-	newfile2 = file_prefix_rela(path) + now + 'all-result.csv'
+	newfile1 = '../Out/' + now + 'all-time.csv'
+	newfile2 = '../Out/' + now + 'all-result.csv'
 	flist = [os.path.basename(f) for f in flist]
 	# TODO: multicore variable competition here for `header`
 	if(os.path.isfile(newfile1)):

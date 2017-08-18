@@ -30,56 +30,23 @@ def configure(args):
 	config_file = args.config
 	config = configparser.ConfigParser()
 
-	if args.config is None:
-		print('====== Use -h for help if you want configuration file ======')
-		if username() == 'zhangysh1995':  # configure on my local desktop
-			z3_path = '/home/zhangysh1995/work/ppdev/z3/build/z3'
-			stp_path = '/home/zhangysh1995/work/stp/stp/build/stp-2.1.2 --SMTLIB2'
-			boolector_path = '/home/zhangysh1995/work/boolector-2.4.1/boolector/bin/boolector --smt2'
-			pp_path = '/home/zhangysh1995/work/ppdev/ppsat/ppbv'
-			ppf_path = ''
-		else:  # configure on sbtest1 docker image
-			z3_path = '/root/Solvers/z3-4.5.0/build/z3'
-			stp_path = '/root/Solvers/stp/stp/build/stp-2.1.2'
-			boolector_path = '/root/Solvers/boolector-2.4.1/boolector/bin/boolector --smt2'
-			pp_path = '/root/Solvers/ppsat/build-dev/ppbv --array'
-			ppf_path = '/root/Sovlers/ppsat-layer/build-dev/ppbv --array --layer'
-		solver_path = [z3_path, stp_path, boolector_path, pp_path, ppf_path]
-		factory = SolverFactory(solver_path)
-		cases = input('Path to your cases: ')
-		cpus = input('CPU cores: ')
-		split_project(cases, factory, cpus=int(cpus))
-	else:
-		with open(config_file, 'r') as f:
-			for line in f:
-				print(line)
-			f.close()
+	with open(config_file, 'r') as f:
+		for line in f:
+			print(line)
+		f.close()
 
-		read = input('Continue?(y/n) ')
-		if read == 'n':
-			exit(0)
-		config.read(config_file)
+	config.read(config_file)
 
-		choice = input('Run which solvers? a.3+1, b.3+2, c.2')
+	# initialize from configuration
+	s1_path = config.get('s1', 'path')
+	s2_path = config.get('s2', 'path')
+	s3_path = config.get('s3', 'path')
 
-		# initialize from configuration
-		z3_path = config.get('z3', 'path')
-		stp_path = config.get('stp', 'path')
-		pp_path = config.get('ppbv', 'path')
-		boolector_path = config.get('boolector', 'path')
-		ppf_path = config.get('ppbvf', 'path')
+	solver_path = [s1_path, s2_path, s3_path]
 
-		# customize solvers
-		if choice == 'c':
-			solver_path = [pp_path, ppf_path]
-		elif choice == 'b':
-			solver_path = [z3_path, stp_path, boolector_path, pp_path, ppf_path]
-		else:
-			solver_path = [z3_path, stp_path, boolector_path, pp_path]
-
-		# run the program
-		factory = SolverFactory(solver_path)
-		split_project(config.get('general', 'cases'), factory, cpus=int(config.get('general', 'cpus')))
+	# run the program
+	factory = SolverFactory(solver_path)
+	split_project(config.get('general', 'cases'), factory, cpus=int(config.get('general', 'cpus')))
 
 
 def run():
@@ -91,3 +58,4 @@ def run():
 
 run()
 # scp_csv()
+
