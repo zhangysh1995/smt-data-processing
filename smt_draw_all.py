@@ -67,18 +67,18 @@ def time_sovled(data):
 
 	times = []
 	# datas = np.genfromtxt('all.csv', skip_header=1, delimiter=',')
-	datas = pd.read_csv('all.csv')
+	# datas = pd.read_csv('all.csv')
 
 	for solver in solvers:
 		time = data[solver]
-		time = [t for t in time if t <= 30.0]
+		time = [t for t in time if float(t) <= 30.0]
+
 		times.append(time)
 
 	rows = len(times[1])
 	Xticks =[int(x) for x in np.linspace(0, rows, 51)]
 
 	for i, time in enumerate(times):
-		# print(time)
 		cumsum = []
 		for tick in Xticks:
 			cumsum.append(sum(time[:int(tick)]))
@@ -109,7 +109,6 @@ def hist_t_query(df, ax):
 		nt = nt.fillna(value=0.0)
 		time.append(nt / sum * 100)
 
-		print(time)
 		color = colors[i]
 
 		if i == 0:
@@ -220,8 +219,9 @@ def comp_time_matrix(path):
 
 def time_query_project(path):
 	csv = sio.find_csv(path)
+	plt.figure(figsize=(6, 4))
 	# create shared x-axis
-	gs = gridspec.GridSpec(5, 1)
+	gs = gridspec.GridSpec(4, 1)
 	gs.update(hspace=0)
 	ax0 = plt.subplot(gs[0])
 
@@ -229,14 +229,16 @@ def time_query_project(path):
 	yticks = mtick.FormatStrFormatter(fmt)
 
 	axis = []
-	for solver in solvers:
+	for solver in solvers[:-1]:
 		df = cat_data_dict(csv, solver)
 		ax = plt.subplot(gs[solvers.index(solver)], sharex=ax0)
 
 		axis.append(ax)
+		ax.yaxis.set_label_position("right")
 		ax.yaxis.set_major_formatter(yticks)
 		ax.set_ylabel(solver)
 		ax.yaxis.get_major_ticks()[0].label1.set_visible(False)
+
 		hist_t_query(df, ax)
 		plt.ylim(0, 115)
 	green = mpatches.Patch(color='green', label='0-0.1s')
@@ -245,9 +247,8 @@ def time_query_project(path):
 	red = mpatches.Patch(color='red', label='2-15s')
 	yellow = mpatches.Patch(color='yellow', label='15-30s')
 	black = mpatches.Patch(color='black', label='>30s')
-	axis[0].legend(handles=[green, cyan, blue, red, yellow, black], bbox_to_anchor=(0.5, 1.5),
+	axis[0].legend(handles=[green, cyan, blue, red, yellow, black], bbox_to_anchor=(0.5, 1.55),
 			   loc='upper center', ncol=3)
-
 
 # count queries processed within layers
 def count_layered(dir, axis):
@@ -324,7 +325,6 @@ def time_solved_all():
 		plt.legend()
 		plt.savefig('../plots/' + folder + '-time-solved.png')
 		plt.close()
-		print('figure')
 
 
 # draw time_query
@@ -332,7 +332,7 @@ def time_query():
 	for dir in dirs:
 		folder = dir.split('/').pop()
 		time_query_project(dir)
-		plt.savefig('../plots/' + folder + '-time-query')
+		plt.savefig('../plots/' + folder + '-time-query', bbox_inches='tight')
 
 
 # draw query-processed layers
