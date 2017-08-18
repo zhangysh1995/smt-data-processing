@@ -133,12 +133,13 @@ def test_with_solver(solver, testfile, timeout):
 def compare_solvers(flist, Solvers):
 	# run cases with all solvers
 	for fname in flist:
-		print('Testing...' + os.path.split(fname)[1], end=' ')
+		print('Testing...' + os.path.split(fname)[1], end=': ')
 		for solver in Solvers:
 			print(solver.name, end=' ')
 			testResult = test_with_solver(solver, fname, 30)
 			solver.results.append(testResult.result)
 			solver.times.append(testResult.runtime)
+			print(testResult.result)
 		print('\n')
 	output_results(Solvers, os.path.split(flist[0])[0] + '/', flist)
 	# output_results_separate(Solvers, cpu)
