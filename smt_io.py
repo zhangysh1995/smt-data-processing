@@ -8,6 +8,7 @@ import pandas as pd
 
 solver_list = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']
 
+
 # find cnf files in path
 def find_cnf(path):
 	flist = []  # path to DIMACS files
@@ -17,6 +18,7 @@ def find_cnf(path):
 			if os.path.splitext(fname)[1] == '.cnf':
 				flist.append(os.path.join(root, fname))
 	return flist
+
 
 # find smt2 files in path
 def find_smt2(path):
@@ -46,7 +48,6 @@ def find_csv_depth(path):
 	return flist
 
 
-
 # cat data for one set together
 def cat_data(path, solver=None):
 	csv = find_csv(path)
@@ -58,6 +59,7 @@ def cat_data(path, solver=None):
 		return data
 
 
+# cat data to be a dict, which is better to use with Pandas
 def cat_data_dict(csv, solver):
 	data = {}
 	for c in csv:
@@ -66,6 +68,8 @@ def cat_data_dict(csv, solver):
 	return pd.DataFrame.from_dict(data, orient='columns')
 
 
+# extracted from smt_tests
+# used to split the file list into parts for multi-core processing
 def split_list(alist, wanted_parts=1):
 	length = len(alist)
 	return [alist[i * length // wanted_parts: (i + 1) * length // wanted_parts]
@@ -98,6 +102,7 @@ def file_prefix_abs(path):
 	return os.path.join(prefix[0], prefix[1])
 
 
+# filename formatter for output csvs
 now = time.strftime('%Y-%m-%d-')
 
 
@@ -193,6 +198,8 @@ def output_results(Solvers, path, flist=None):
 		except IOError as e:
 			print('I/O error when saving results: ')
 
+
+# output the smt2 filenames to a file
 def output_cases(flist):
 	# output case names
 	with open('CaseNames.txt', 'w') as CaseNames:

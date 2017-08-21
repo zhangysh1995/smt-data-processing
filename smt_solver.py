@@ -1,15 +1,29 @@
 import os
 import pwd
 
+
+'''
+Use this module to customize your solvers and the wau to create solver instances.
+Now factory design pattern is used but not flexible enough if you have changed number of solver.
+Consider port Java Proxy here as a solution to this problem
+'''
+
+# solvers we have now
 '''
 z3
 stp
 ppbv
 boolector
+ppbvf
+s0-s6
+s0-s2
 '''
+
 
 # The factory to create solvers
 class SolverFactory:
+	# please be careful with this method parameters
+	# TODO: so ugly with hard-coded indexes
 	def __init__(self, solver_path):
 		if len(solver_path) >= 4:
 			self.solver_No = len(solver_path)
@@ -56,7 +70,6 @@ class SolverFactory:
 
 # To construct solvers
 class Solver:
-
 	def __init__(self, name, path):
 		self.name = name
 		self.path = path

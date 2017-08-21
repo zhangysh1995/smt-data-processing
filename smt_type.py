@@ -11,6 +11,7 @@ colors = ['k', 'royalblue', 'dodgerblue', 'deepskyblue', 'lightskyblue']
 # query type of a project
 
 
+# calculate the feature of every query in a project folder e.g. sage
 def type_dir(project):
 	for path, dirs, files in os.walk(project):
 		for d in dirs:
@@ -132,6 +133,8 @@ def atomic_percent(file):
 	plt.savefig('Distribution-of-atomic.png', bbox_inches='tight')
 
 
+# distribution of variables in a benchmark with quartiles
+# actually not useful
 def percent(var):
 	dirs = var[0]
 	var_list = var[1]
@@ -158,6 +161,7 @@ def percent(var):
 	return dirs, ticks
 
 
+# set the plots styles
 def set_style():
 	ax = plt.subplot()
 	# format y tick to percentage
@@ -166,6 +170,7 @@ def set_style():
 	ax.yaxis.set_major_formatter(yticks)
 
 
+# grasp the sum of each feature in one project respectively
 def get_features(file):
 	out = '../Out/' + file + '.csv'
 
@@ -261,6 +266,7 @@ def equality(file):
 	plt.savefig('equality.png', bbox_inches='tight')
 
 
+# a query is count as linear if it has more linear features than non-linears
 def linear_set(file):
 	# basic_list = [4, 6, 7, 12, 14]
 	linear_list = [18, 20]
@@ -292,6 +298,7 @@ def linear_set(file):
 	return dirs, types
 
 
+# similar to last
 def linear_ratio(file):
 	# basic_list = [4, 6, 7, 12, 14]
 	linear_list = [18, 20]

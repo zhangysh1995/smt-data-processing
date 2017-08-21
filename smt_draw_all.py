@@ -16,6 +16,11 @@ import os.path
 import glob
 import math
 
+'''
+All methods to draw the result plots
+Wrappers of easy methods are at last
+'''
+
 dirs = ['../Out/sage', '../Out/KLEE', '../Out/PP-CASE']
 cases = ['../PPBV/sage', '../PPBV/KLEE', '../PPBV/PP-CASE']
 solvers = ['z3', 'stp', 'boolector', 'ppbv', 'ppbvf']

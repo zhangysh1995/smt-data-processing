@@ -14,6 +14,11 @@ from smt_io import find_smt2, split_list, combine_data, output_results_separate,
 from smt_solver import SolverFactory
 
 
+'''
+This is the final module which actually deal with running the solvers
+Starts from the last method in this file.
+'''
+
 class TestResult:
 	def __init__(self, runtime, result, verify, error):
 		self.runtime = runtime
@@ -146,12 +151,22 @@ def compare_solvers(flist, Solvers):
 	print('Finished!')
 
 
+'''
+Single thread to process
+Not adjusted to new methods, but still works in a previous manner
+'''
+
+
 # return z3_time, z3_solved, bo_time, bo_solved, pp_time, pp_solved
 def test_solvers(path, Solvers):
 	flist = find_smt2(path)
 	output_cases(flist)
 	# run the tests
 	compare_solvers(flist, Solvers)
+
+'''
+Multicore processing
+'''
 
 
 def test_solver_parallel(flist, factory, cpus=0):

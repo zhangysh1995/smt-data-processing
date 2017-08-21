@@ -3,6 +3,12 @@ import numpy as np
 import smt_io as sio
 import os
 
+'''
+This module is used to output the big matrix of running results.
+You should have both result.csv and time.csv under your output folders.
+'''
+
+
 solvers = ['boolector', 'z3', 'stp', 'ppbv', 'ppbvf']
 dirs = ['sage', 'KLEE', 'PP-CASE']
 
@@ -48,13 +54,13 @@ def dir_name(path):
 	# name = path[path.index(dir)+len(dir):].replace('/', '-')
 	return os.path.basename(path)
 
-
+now = '2017-08-18-'
 def results_file(path):
-	return abs + sio.file_prefix_abs(path) + sio.now + 'all-result.csv'
+	return abs + sio.file_prefix_abs(path) + now + 'all-result.csv'
 
 
 def times_file(path):
-	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
+	return abs + sio.file_prefix_abs(path) + now + 'all-time.csv'
 
 
 def solver_table(path, query_no):
@@ -62,21 +68,20 @@ def solver_table(path, query_no):
 	times = times_file(path)
 	line = ''
 	mintime = 100000
-	print(query_no)
+
 	for i, solver in enumerate(solvers):
 		# print solved instance
 		data = pd.read_csv(results)
 		df = pd.DataFrame(data, columns=[solver])
 		unsolved = query_no - int(df[df[solver].str.contains('sat')].count().to_string(index=False))
-		print(unsolved)
 		line += str(unsolved) + ' & '
+
 		# print total time
 		data = pd.read_csv(times)
 		df = pd.DataFrame(data, columns=[solver])
 		time = df.sum().to_string(index=False, float_format='{:.0f}'.format)
 		line += time
 
-		print(solver)
 		if i > 2:
 			line += ' & ' + '{:.0f}'.format((-float(time)/mintime + 1)*100) + '\% '
 		else:
@@ -93,12 +98,14 @@ def dir_table(path):
 def all_table():
 	for dir in dirs:
 		dir_table('/home/zhangysh1995/PPBV/'+ dir)
-	# dir_table('/home/zhangysh1995/PPBV/PP-CASE')
+	# dir_table('/home//zhangysh1995/PPBV/sage')
 		write_table('\\hline\n')
 
 
 # dir_name('/home/zhangysh1995/ctags/KLEE/test')
 # count_queries('/home/zhangysh1995/PPBV')
+
+# path to your output root
 abs = '/home/zhangysh1995/work/results/Out/'
 # dir_table('/home/zhangysh1995/PPBV/sage')
 all_table()

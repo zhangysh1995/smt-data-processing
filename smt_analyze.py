@@ -7,6 +7,9 @@ Usage:
 import smt_analyze as sal
 '''
 
+'''
+Some easy code to analyze your output, you could start here
+'''
 # Example
 # data = read_data('Out/xxx.csv')
 # hist_t_query(data)

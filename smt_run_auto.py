@@ -6,6 +6,14 @@ import smt_tests as st
 from smt_solver import SolverFactory
 # from tools.ssh import scp_csv
 
+'''
+Called by smt_run_all.py
+This module is used to run tests automatically on the server
+NO NEED to change if solvers are stable
+
+'''
+
+
 def username():
 	return pwd.getpwuid(os.geteuid()).pw_name
 
@@ -24,6 +32,12 @@ def split_project(entrance, factory, cpus):
 			return
 	else:
 		print('Directory Missing ' + entrance)
+
+
+'''
+If you need to change the solvers, first get familiar with config.ini file
+then change this following method to fit your changes
+'''
 
 
 def configure(config_file):

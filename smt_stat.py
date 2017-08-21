@@ -4,6 +4,11 @@ import numpy as np
 from smt_draw_all import colors, markers
 from smt_io import file
 
+
+'''
+Not in use anymore but still useful in some cases
+'''
+
 solvers = ['z3', 'stp', 'boolector', 'ppbv']
 
 

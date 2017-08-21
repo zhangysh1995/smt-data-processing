@@ -6,6 +6,11 @@ import smt_tests as st
 from smt_solver import SolverFactory
 # from tools.ssh import scp_csv
 
+'''
+Similar to smt_run_auto, but this module it for running the benchmarks manually
+'''
+
+
 def username():
 	return pwd.getpwuid(os.geteuid()).pw_name
 
