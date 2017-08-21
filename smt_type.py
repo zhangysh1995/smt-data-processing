@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 
 smtbench = '/home/zhangysh1995/work/ppdev/smtbench/cmake-build-debug/smtbench '
 
-colors = ['k', 'plum', 'dodgerblue', 'springgreen', 'yellow']
+colors = ['k', 'royalblue', 'dodgerblue', 'deepskyblue', 'lightskyblue']
 # query type of a project
 
 
@@ -84,16 +84,60 @@ def variable_hist(file):
 	return dir, var_list
 
 
+# atomic predicates hist
+def atomic_hist(file):
+	atomic = [1, 8, 15, 19, 22, 23, 24, 25, 26]
+	dir = []
+	atomic_no = []
+	out = '../Out/' + file + '.csv'
+	with open(out, 'r') as f:
+		dir.append(f.readline())
+
+		atomic_sum = []
+		for line in f:
+			data = line.split()
+			if 'smt2' in data[0]:
+				data = [int(d) for d in data[1:-1]]
+				atomic_sum.append(sum([data[i] for i in atomic]))
+			else:
+				dir.append(data[0])
+				atomic_no.append(atomic_sum)
+				atomic_sum = []
+		atomic_no.append(atomic_sum)
+	return dir, atomic_no
+
+
 # draw distribution of variables for one file
 def var_percent(file):
 	var = variable_hist(file)
+	dirs, ticks = percent(var)
+	# set x ticks
+	plt.xticks(ticks, dirs)
+	# set legend
+	# plt.title('Distribution of Variable Numbers Across sage Projects')
+	plt.xlabel('Applications')
+	# plt.ylabel('No.')
+	plt.savefig('Distribution-of-variable.png', bbox_inches='tight')
+
+
+# draw distribution of variables for one file
+def atomic_percent(file):
+	var = atomic_hist(file)
+	dirs, ticks = percent(var)
+	# set x ticks
+	plt.xticks(ticks, dirs)
+	# set legend
+	plt.xlabel('Applications')
+	# plt.ylabel('No.')
+	plt.savefig('Distribution-of-atomic.png', bbox_inches='tight')
+
+
+def percent(var):
 	dirs = var[0]
 	var_list = var[1]
-
 	set_style()
-
 	# generate x position for bars
-	ticks = range(len(dirs)+1)[1:]
+	ticks = range(len(dirs) + 1)[1:]
 	# iterate each project
 	for d, v, x in zip(dirs, var_list, ticks):
 		window = np.linspace(0, max(v), 5)
@@ -103,21 +147,15 @@ def var_percent(file):
 		for w in window:
 			count.append(len(list(filter(lambda n: n <= w, v))))
 		# normalize y
-		count = [c/all*100 for c in count]
+		count = [c / all * 100 for c in count]
 		# plot the bar for one project stacked
 		for i, c in enumerate(count):
 			if i == 0:
-				plt.bar(x, c/all*100, color=colors[i])
+				plt.bar(x, c / all * 100, color=colors[i])
 			else:
-				plt.bar(x, c-count[i-1], bottom=count[i-1], color=colors[i])
+				plt.bar(x, c - count[i - 1], bottom=count[i - 1], color=colors[i])
 
-
-	# set x ticks
-	plt.xticks(ticks, dirs)
-	# set legend
-	plt.title('Distribution of Variable Numbers Across sage Projects')
-	plt.xlabel('project')
-	plt.ylabel('No.')
+	return dirs, ticks
 
 
 def set_style():
@@ -194,9 +232,10 @@ def linearity(file):
 	axis.legend(handles=[blue, green, yellow])
 	# set x ticks
 	plt.xticks(ticks, dirs)
-	plt.savefig('linearity.png')
+	plt.savefig('linearity.png', bbox_inches='tight')
 
 
+# ratio of euqal:inequal
 def equality(file):
 	inequal = [8, 15, 19, 22, 23, 24, 25, 26]
 	equal = [1]
@@ -219,7 +258,7 @@ def equality(file):
 	axis.legend(handles=[blue, green])
 	# set x ticks
 	plt.xticks(ticks, dirs)
-	plt.savefig('equality.png')
+	plt.savefig('equality.png', bbox_inches='tight')
 
 
 def linear_set(file):
@@ -292,6 +331,7 @@ Below are usages
 # plt.bar(range(0, 32), count('sage'))
 # variable_hist('sage')
 # var_percent('sage')
+atomic_percent('sage')
 # get_features('sage')
 # linearity('sage')
 # equality('sage')
