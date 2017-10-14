@@ -32,7 +32,7 @@ def count_queries(path):
 
 
 def write_table(line):
-	with open('/home/zhangysh1995/work/results/Out/Table3.txt', 'a+') as f:
+	with open('/root/Out/Table3.txt', 'a+') as f:
 		try:
 			f.write(str(line))
 			f.close()
@@ -54,13 +54,13 @@ def dir_name(path):
 	# name = path[path.index(dir)+len(dir):].replace('/', '-')
 	return os.path.basename(path)
 
-now = '2017-08-18-'
+# now = '2017-08-18-'
 def results_file(path):
-	return abs + sio.file_prefix_abs(path) + now + 'all-result.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-result.csv'
 
 
 def times_file(path):
-	return abs + sio.file_prefix_abs(path) + now + 'all-time.csv'
+	return abs + sio.file_prefix_abs(path) + sio.now + 'all-time.csv'
 
 
 def solver_table(path, query_no):
@@ -96,16 +96,16 @@ def dir_table(path):
 
 
 def all_table():
-	for dir in dirs:
-		dir_table('/home/zhangysh1995/PPBV/'+ dir)
-	# dir_table('/home//zhangysh1995/PPBV/sage')
-		write_table('\\hline\n')
+	#for dir in dirs:
+	#	dir_table('/root/PPBV/'+ dir)
+	dir_table('/root/PPBV/KLEE')
+	write_table('\\hline\n')
 
 
 # dir_name('/home/zhangysh1995/ctags/KLEE/test')
 # count_queries('/home/zhangysh1995/PPBV')
 
 # path to your output root
-abs = '/home/zhangysh1995/work/results/Out/'
+abs = '/root/Out/'
 # dir_table('/home/zhangysh1995/PPBV/sage')
 all_table()
